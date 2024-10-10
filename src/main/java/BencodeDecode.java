@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BencodeDecode {
     private Integer current=0;
@@ -10,6 +12,8 @@ public class BencodeDecode {
             return decodeNumber(bencodedString);
         }else if(bencodedString.charAt(current) =='l'){
             return decodeList(bencodedString);
+        }else if(bencodedString.charAt(current) =='d'){
+
         }else {
             throw new RuntimeException("Only strings are supported at the moment");
         }
@@ -20,6 +24,16 @@ public class BencodeDecode {
         current++;
         while (toDecode.charAt(current) != 'e'){
             decodeds.add(decode(toDecode));
+        }
+        current++;
+        return decodeds;
+    }
+
+    private Map<Object, Object> decodeMap(String toDecode){
+        Map<Object, Object> decodeds= new HashMap<>();
+        current++;
+        while (toDecode.charAt(current) != 'e'){
+            decodeds.put(decode(toDecode), decode(toDecode));
         }
         current++;
         return decodeds;
