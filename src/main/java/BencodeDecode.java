@@ -18,7 +18,7 @@ public class BencodeDecode {
 
     private List<Object> decodeToList(String toDecode){
         List<Object> decodeds= new ArrayList<>();
-        if(toDecode.charAt(currenIdx) != 'e'){
+        while (toDecode.charAt(currenIdx) != 'e'){
             currenIdx+=1;
             decodeds.add(decode(toDecode.substring(currenIdx)));
         }
