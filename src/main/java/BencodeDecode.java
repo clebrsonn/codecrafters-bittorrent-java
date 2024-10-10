@@ -2,39 +2,53 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BencodeDecode {
-    private Integer currenIdx = 0;
-
+    private Integer current=0;
     public Object decode(String bencodedString){
-        currenIdx+=1;
-        if(Character.isDigit(bencodedString.charAt(0))){
-            return decodeToString(bencodedString);
-        }else if(bencodedString.startsWith("i")){
-            return decodeToNumber(bencodedString);
-        }else if(bencodedString.startsWith("l")){
-            return decodeToList(bencodedString);
+        if(Character.isDigit(bencodedString.charAt(current))){
+            return decodeString(bencodedString);
+        }else if(bencodedString.charAt(current) == 'i'){
+            return decodeNumber(bencodedString);
+        }else if(bencodedString.charAt(current) =='l'){
+            return decodeList(bencodedString);
         }else {
             throw new RuntimeException("Only strings are supported at the moment");
         }
     }
 
-    private List<Object> decodeToList(String toDecode){
+    private List<Object> decodeList(String toDecode){
         List<Object> decodeds= new ArrayList<>();
-        while (toDecode.charAt(currenIdx) != 'e'){
-            currenIdx+=1;
-            decodeds.add(decode(toDecode.substring(currenIdx)));
+        current++;
+        while (toDecode.charAt(current) != 'e'){
+            decodeds.add(decode(toDecode));
         }
+        current++;
         return decodeds;
     }
 
-    private Long decodeToNumber(String toDecode){
-        currenIdx= toDecode.indexOf("e")+1;
-        return Long.parseLong(toDecode.substring(1,currenIdx-1));
+    private Long decodeNumber(String encodedValue) {
+        int start = current + 1, end = 0;
+        for (int i = start; i < encodedValue.length(); i++) {
+            if (encodedValue.charAt(i) == 'e') {
+                end = i;
+                break;
+            }
+        }
+        current = end + 1;
+        return Long.parseLong(encodedValue.substring(start, end));
     }
 
-    private String decodeToString(String toDecode){
-        int firstColonIndex = toDecode.indexOf(":");
-        int length = Integer.parseInt(toDecode.substring(0, firstColonIndex));
-        currenIdx=firstColonIndex+1+length;
-        return toDecode.substring(firstColonIndex+1, currenIdx);
+    private String decodeString(String encodedValue) {
+        int delimeterIndex = 0;
+        for (int i = current; i < encodedValue.length(); i++) {
+            if (encodedValue.charAt(i) == ':') {
+                delimeterIndex = i;
+                break;
+            }
+        }
+        int length =
+                Integer.parseInt(encodedValue.substring(current, delimeterIndex));
+        int start = delimeterIndex + 1, end = start + length;
+        current = end;
+        return encodedValue.substring(start, end);
     }
 }
