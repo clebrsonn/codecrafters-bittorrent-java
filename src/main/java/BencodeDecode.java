@@ -13,7 +13,7 @@ public class BencodeDecode {
         }else if(bencodedString.charAt(current) =='l'){
             return decodeList(bencodedString);
         }else if(bencodedString.charAt(current) =='d'){
-
+            return decodeMap(bencodedString);
         }else {
             throw new RuntimeException("Only strings are supported at the moment");
         }
