@@ -12,7 +12,7 @@ public class BencodeDecode {
         }else if(bencodedString.startsWith("l")){
             return decodeToList(bencodedString);
         }
-        return "";
+        return bencodedString;
     }
 
     private List<Object> decodeToList(String toDecode){
