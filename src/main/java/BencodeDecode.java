@@ -11,9 +11,8 @@ public class BencodeDecode {
             return decodeToNumber(bencodedString);
         }else if(bencodedString.startsWith("l")){
             return decodeToList(bencodedString);
-        }else {
-            throw new RuntimeException("Only strings are supported at the moment");
         }
+        return null;
     }
 
     private List<Object> decodeToList(String toDecode){
