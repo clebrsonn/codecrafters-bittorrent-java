@@ -5,14 +5,16 @@ public class BencodeDecode {
     private Integer currenIdx = 0;
 
     public Object decode(String bencodedString){
+        System.out.println(bencodedString);
         if(Character.isDigit(bencodedString.charAt(0))){
             return decodeToString(bencodedString);
         }else if(bencodedString.startsWith("i")){
             return decodeToNumber(bencodedString);
         }else if(bencodedString.startsWith("l")){
             return decodeToList(bencodedString);
+        }else {
+            throw new RuntimeException("Only strings are supported at the moment");
         }
-        return bencodedString;
     }
 
     private List<Object> decodeToList(String toDecode){
@@ -28,7 +30,6 @@ public class BencodeDecode {
         currenIdx= toDecode.indexOf("e")+1;
         return Long.parseLong(toDecode.substring(1,currenIdx-1));
     }
-
 
     private String decodeToString(String toDecode){
         int firstColonIndex = toDecode.indexOf(":");
