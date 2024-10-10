@@ -5,7 +5,6 @@ public class BencodeDecode {
     private Integer currenIdx = 0;
 
     public Object decode(String bencodedString){
-        System.out.println(bencodedString);
         currenIdx+=1;
         if(Character.isDigit(bencodedString.charAt(0))){
             return decodeToString(bencodedString);
