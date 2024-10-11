@@ -1,5 +1,6 @@
 import com.google.gson.Gson;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.SplittableRandom;
@@ -19,7 +20,7 @@ public class Main {
       //  Uncomment this block to pass the first stage
         String bencodedValue = args[1];
         try {
-          decoded = new BencodeDecode().decode(bencodedValue);
+          decoded = new BencodeDecode().decode(bencodedValue.getBytes(StandardCharsets.UTF_8));
         } catch(RuntimeException e) {
           System.out.println(e.getMessage());
           return;
@@ -28,7 +29,7 @@ public class Main {
     }else if("info".equals(command)) {
         TorrentInputStream torrentInputStream= new TorrentInputStream();
         byte[] file= torrentInputStream.readFile("./sample.torrent");
-        decoded = new BencodeDecode().decode(new String(file));
+        decoded = new BencodeDecode().decode(file);
 
         System.out.println("Tracker URL: " + ((HashMap<String, Object>) decoded).get("announce"));
         System.out.println("Length: " + ((HashMap<String, Object>)((HashMap<String, Object>) decoded).get("info")).get("length"));
