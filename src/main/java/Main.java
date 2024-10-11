@@ -1,6 +1,7 @@
 import com.google.gson.Gson;
 
 import java.util.Arrays;
+import java.util.SplittableRandom;
 // import com.dampcake.bencode.Bencode; - available if you need it!
 
 public class Main {
@@ -27,7 +28,7 @@ public class Main {
     }else if("info".equals(command)) {
         TorrentInputStream torrentInputStream= new TorrentInputStream();
         byte[] file= torrentInputStream.readFile(args[1]);
-        decoded = new BencodeDecode().decode(file.toString());
+        decoded = new BencodeDecode().decode(new String(file));
 //            Tracker URL: http://bittorrent-test-tracker.codecrafters.io/announce
 //            Length: 92063
         System.out.println(gson.toJson(decoded));
