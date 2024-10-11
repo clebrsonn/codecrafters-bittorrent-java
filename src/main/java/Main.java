@@ -32,7 +32,7 @@ public class Main {
 
         System.out.println("Tracker URL: " + ((HashMap<String, Object>) decoded).get("announce"));
         System.out.println("Length: " + ((HashMap<String, Object>)((HashMap<String, Object>) decoded).get("info")).get("length"));
-        System.out.println("Info Hash: " + TorrentInputStream.byteArray2Hex(new BencodeEncode().encode(((HashMap<String, Object>) decoded).get("info"), BencodeType.DICTIONARY).getBytes()));
+        System.out.println("Info Hash: " + TorrentInputStream.byteArray2Hex(new BencodeEncode().encode(((HashMap<String, Object>) decoded).get("info"), BencodeType.DICTIONARY)));
 
     } else {
       System.out.println("Unknown command: " + command);
