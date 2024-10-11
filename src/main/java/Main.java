@@ -10,27 +10,27 @@ public class Main {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     //System.out.println("Logs from your program will appear here!");
     String command = args[0];
-    if("decode".equals(command) || "info".equals(command)) {
+      Object decoded;
+
+      if("decode".equals(command)) {
       //  Uncomment this block to pass the first stage
         String bencodedValue = args[1];
-        Object decoded;
         try {
           decoded = new BencodeDecode().decode(bencodedValue);
         } catch(RuntimeException e) {
           System.out.println(e.getMessage());
           return;
         }
-        if("decode".equals(command)) {
-            System.out.println(gson.toJson(decoded));
-        }
-        if("info".equals(command)) {
-            TorrentInputStream torrentInputStream= new TorrentInputStream();
-            byte[] file= torrentInputStream.readFile(args[1]);
+        System.out.println(gson.toJson(decoded));
+
+
+    }else if("info".equals(command)) {
+        TorrentInputStream torrentInputStream= new TorrentInputStream();
+        byte[] file= torrentInputStream.readFile(args[1]);
+        decoded = new BencodeDecode().decode(file.toString());
 //            Tracker URL: http://bittorrent-test-tracker.codecrafters.io/announce
 //            Length: 92063
-            new BencodeDecode().decode(Arrays.toString(file));
-            System.out.println(gson.toJson(decoded));
-        }
+        System.out.println(gson.toJson(decoded));
     } else {
       System.out.println("Unknown command: " + command);
     }
