@@ -14,6 +14,14 @@ public class TorrentInputStream {
     public static String byteArray2Hex(final byte[] hash) throws NoSuchAlgorithmException {
 
         MessageDigest digest2 = MessageDigest.getInstance("SHA-1");
-        return digest2.digest(hash).toString();
+
+        var bytes= digest2.digest(hash);
+        var sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+
+        return sb.toString();
+
     }
 }
