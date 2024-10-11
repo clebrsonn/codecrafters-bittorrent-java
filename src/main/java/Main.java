@@ -1,10 +1,11 @@
+import com.dampcake.bencode.Type;
 import com.google.gson.Gson;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.SplittableRandom;
-// import com.dampcake.bencode.Bencode; - available if you need it!
+import com.dampcake.bencode.Bencode; //- available if you need it!
 
 public class Main {
   private static final Gson gson = new Gson();
@@ -32,7 +33,11 @@ public class Main {
 
         System.out.println("Tracker URL: " + ((HashMap<String, Object>) decoded).get("announce"));
         System.out.println("Length: " + ((HashMap<String, Object>)((HashMap<String, Object>) decoded).get("info")).get("length"));
-        System.out.println("Info Hash: " + TorrentInputStream.byteArray2Hex(new BencodeEncode().encode(((HashMap<String, Object>) decoded).get("info"), BencodeType.DICTIONARY)));
+        Bencode bencode = new Bencode(true);
+
+          System.out.println("Info Hash: " + TorrentInputStream.byteArray2Hex(bencode.encode(
+                  ((HashMap<String, Object>)((HashMap<String, Object>) decoded).get("info")))
+      ));
 
     } else {
       System.out.println("Unknown command: " + command);
