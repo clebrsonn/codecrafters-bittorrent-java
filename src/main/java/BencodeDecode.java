@@ -63,7 +63,7 @@ public class BencodeDecode {
         for (int i = current; i < encodedValue.length; i++) {
             if ((char)encodedValue[i] != ':') {
 
-                buffer.append(encodedValue[i]);
+                buffer.append((char)encodedValue[i]);
             }else{
                 delimeterIndex = i;
                 break;
@@ -75,8 +75,8 @@ public class BencodeDecode {
         current = end;
 
         StringBuilder buffer2 = new StringBuilder();
-        for (int i = start; i <= end; i++) {
-            buffer2.append(encodedValue[i]);
+        for (int i = start; i < end; i++) {
+            buffer2.append((char)encodedValue[i]);
         }
 
         return buffer2.toString();
