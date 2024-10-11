@@ -39,6 +39,9 @@ public class Main {
                   (HashMap<String, Object>) bencode.decode(file, Type.DICTIONARY).get("info"))
       ));
 
+          System.out.println("Piece Length: " + ((HashMap<String, Object>)((HashMap<String, Object>) decoded).get("info")).get("piece length"));
+          System.out.println("Piece Hashes: " + ((HashMap<String, Object>)((HashMap<String, Object>) decoded).get("info")).get("pieces"));
+
     } else {
       System.out.println("Unknown command: " + command);
     }
