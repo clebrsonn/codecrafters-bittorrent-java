@@ -1,3 +1,4 @@
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -5,64 +6,79 @@ import java.util.Map;
 
 public class BencodeDecode {
     private Integer current=0;
-    public Object decode(String bencodedString){
-        if(Character.isDigit(bencodedString.charAt(current))){
+    public Object decode(byte[] bencodedString){
+        if(Character.isDigit((char) bencodedString[current])){
             return decodeString(bencodedString);
-        }else if(bencodedString.charAt(current) == 'i'){
+        }else if((char) bencodedString[current] == 'i'){
             return decodeNumber(bencodedString);
-        }else if(bencodedString.charAt(current) =='l'){
+        }else if((char) bencodedString[current] =='l'){
             return decodeList(bencodedString);
-        }else if(bencodedString.charAt(current) =='d'){
+        }else if((char) bencodedString[current] =='d'){
             return decodeMap(bencodedString);
         }else {
             throw new RuntimeException("Only strings are supported at the moment");
         }
     }
 
-    private List<Object> decodeList(String toDecode){
+    private List<Object> decodeList(byte[] toDecode){
         List<Object> decodeds= new ArrayList<>();
         current++;
-        while (toDecode.charAt(current) != 'e'){
+        while ((char) toDecode[current] != 'e'){
             decodeds.add(decode(toDecode));
         }
         current++;
         return decodeds;
     }
 
-    private Map<Object, Object> decodeMap(String toDecode){
+    private Map<Object, Object> decodeMap(byte[] toDecode){
         Map<Object, Object> decodeds= new HashMap<>();
         current++;
-        while (toDecode.charAt(current) != 'e'){
+        while ((char) toDecode[current] != 'e'){
             decodeds.put(decode(toDecode), decode(toDecode));
         }
         current++;
         return decodeds;
     }
 
-    private Long decodeNumber(String encodedValue) {
+    private Long decodeNumber(byte[] encodedValue) {
         int start = current + 1, end = 0;
-        for (int i = start; i < encodedValue.length(); i++) {
-            if (encodedValue.charAt(i) == 'e') {
-                end = i;
+        StringBuilder buffer = new StringBuilder();
+        for (int i = start; i < encodedValue.length; i++) {
+            if ((char) encodedValue[i] != 'e') {
+                buffer.append((char) encodedValue[i]);
+
+            }else{
+                end =i;
                 break;
             }
         }
         current = end + 1;
-        return Long.parseLong(encodedValue.substring(start, end));
+
+        return new BigDecimal(buffer.toString()).longValue();
     }
 
-    private String decodeString(String encodedValue) {
+    private String decodeString(byte[] encodedValue) {
         int delimeterIndex = 0;
-        for (int i = current; i < encodedValue.length(); i++) {
-            if (encodedValue.charAt(i) == ':') {
+        StringBuilder buffer = new StringBuilder();
+        for (int i = current; i < encodedValue.length; i++) {
+            if ((char)encodedValue[i] != ':') {
+
+                buffer.append(encodedValue[i]);
+            }else{
                 delimeterIndex = i;
                 break;
             }
         }
         int length =
-                Integer.parseInt(encodedValue.substring(current, delimeterIndex));
+                new BigDecimal(buffer.toString()).intValue();
         int start = delimeterIndex + 1, end = start + length;
         current = end;
-        return encodedValue.substring(start, end);
+
+        StringBuilder buffer2 = new StringBuilder();
+        for (int i = start; i <= end; i++) {
+            buffer2.append(encodedValue[i]);
+        }
+
+        return buffer2.toString();
     }
 }

@@ -25,14 +25,11 @@ public class Main {
           return;
         }
         System.out.println(gson.toJson(decoded));
-
-
     }else if("info".equals(command)) {
         TorrentInputStream torrentInputStream= new TorrentInputStream();
         byte[] file= torrentInputStream.readFile("./sample.torrent");
         decoded = new BencodeDecode().decode(new String(file));
-//            Tracker URL: http://bittorrent-test-tracker.codecrafters.io/announce
-//            Length: 92063
+
         System.out.println("Tracker URL: " + ((HashMap<String, Object>) decoded).get("announce"));
         System.out.println("Length: " + ((HashMap<String, Object>)((HashMap<String, Object>) decoded).get("info")).get("length"));
     } else {
