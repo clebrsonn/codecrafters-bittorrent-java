@@ -11,9 +11,9 @@ public class TorrentInputStream {
         return Files.readAllBytes(Paths.get(fileName));
     }
 
-    public static byte[] byteArray2Hex(final byte[] hash) throws NoSuchAlgorithmException {
+    public static String byteArray2Hex(final byte[] hash) throws NoSuchAlgorithmException {
 
-        MessageDigest digest = MessageDigest.getInstance("SHA-1");
-        return digest.digest(hash);
+        MessageDigest digest2 = MessageDigest.getInstance("SHA-1");
+        return new String(digest2.digest(hash));
     }
 }
