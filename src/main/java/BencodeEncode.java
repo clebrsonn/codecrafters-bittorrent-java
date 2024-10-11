@@ -25,7 +25,7 @@ public class BencodeEncode {
         return "l" +toEncode.stream().sorted().map(o -> (encode(o, BencodeType.from(o.getClass().getName())))).collect(Collectors.joining())+"e";
     }
     String encodeDic(Map<String, Object> toEncode){
-        return "d" + toEncode.entrySet().stream().sorted().map(o -> (encode(o.getKey(), BencodeType.STRING) +encode(o.getValue(), BencodeType.from(o.getValue().getClass().getName())))).collect(Collectors.joining())+"e";
+        return "d" + toEncode.entrySet().stream().map(o -> (encode(o.getKey(), BencodeType.STRING) +encode(o.getValue(), BencodeType.from(o.getValue().getClass().getName())))).sorted().collect(Collectors.joining())+"e";
     }
 
     String encodeString(Object bencodeDecoded){
