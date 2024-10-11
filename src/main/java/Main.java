@@ -36,7 +36,7 @@ public class Main {
         Bencode bencode = new Bencode(true);
 
           System.out.println("Info Hash: " + TorrentInputStream.byteArray2Hex(bencode.encode(
-                  ((HashMap<String, Object>)((HashMap<String, Object>) decoded).get("info")))
+                  (HashMap<String, Object>) bencode.decode(file, Type.DICTIONARY).get("info"))
       ));
 
     } else {
