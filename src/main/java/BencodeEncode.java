@@ -22,14 +22,14 @@ public class BencodeEncode {
     }
 
     String encodeList(List<Object> toEncode){
-        return toEncode.stream().map(o -> ("l" +encode(o, BencodeType.valueOf(o.getClass().getName()))+"e")).collect(Collectors.joining());
+        return "l" +toEncode.stream().map(o -> (encode(o, BencodeType.from(o.getClass().getName())))).collect(Collectors.joining())+"e";
     }
     String encodeDic(Map<String, Object> toEncode){
-        return toEncode.entrySet().stream().map(o -> ("d" +encode(o.getKey(), BencodeType.STRING) +encode(o.getValue(), BencodeType.valueOf(o.getValue().getClass().getName()))+"e")).collect(Collectors.joining());
+        return "d" + toEncode.entrySet().stream().map(o -> (encode(o.getKey(), BencodeType.STRING) +encode(o.getValue(), BencodeType.from(o.getValue().getClass().getName())))).collect(Collectors.joining())+"e";
     }
 
     String encodeString(Object bencodeDecoded){
-     return ((String) bencodeDecoded).length() + ":" + bencodeDecoded + "e";
+     return ((String) bencodeDecoded).length() + ":" + bencodeDecoded;
     }
 
     String encodeNumber(Object bencodeDecoded){
