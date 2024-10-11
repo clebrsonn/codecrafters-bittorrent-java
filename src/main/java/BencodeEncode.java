@@ -4,7 +4,7 @@ import java.util.stream.Collectors;
 
 public class BencodeEncode {
 
-    public String encode(Object bencodeDecoded, BencodeType type){
+    public byte[] encode(Object bencodeDecoded, BencodeType type){
 
         if(BencodeType.LIST.equals(type)){
             return encodeList((List<Object>)bencodeDecoded);
@@ -21,18 +21,23 @@ public class BencodeEncode {
 
     }
 
-    String encodeList(List<Object> toEncode){
+    byte[] encodeList(List<Object> toEncode){
         return "l" +toEncode.stream().sorted().map(o -> (encode(o, BencodeType.from(o.getClass().getName())))).collect(Collectors.joining())+"e";
     }
-    String encodeDic(Map<String, Object> toEncode){
-        return "d" + toEncode.entrySet().stream().map(o -> (encode(o.getKey(), BencodeType.STRING) +encode(o.getValue(), BencodeType.from(o.getValue().getClass().getName())))).sorted().collect(Collectors.joining())+"e";
+    byte[] encodeDic(Map<String, Object> toEncode){
+        StringBuilder builder= new StringBuilder();
+        return ("d" + toEncode.entrySet().stream().map(o -> {
+                    builder.append(encode(o.getKey(), BencodeType.STRING));
+                    builder.append(encode(o.getValue(), BencodeType.from(o.getValue().getClass().getName())));
+                    return builder;
+                }).sorted().collect(Collectors.joining())+"e").getBytes();
     }
 
-    String encodeString(Object bencodeDecoded){
-     return ((String) bencodeDecoded).length() + ":" + bencodeDecoded;
+    byte[] encodeString(Object bencodeDecoded){
+     return (((String) bencodeDecoded).length() + ":" + bencodeDecoded).getBytes();
     }
 
-    String encodeNumber(Object bencodeDecoded){
-        return "i" + bencodeDecoded + "e";
+    byte[] encodeNumber(Object bencodeDecoded){
+        return ("i" + bencodeDecoded + "e").getBytes();
     }
 }
