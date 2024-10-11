@@ -22,7 +22,11 @@ public class BencodeEncode {
     }
 
     byte[] encodeList(List<Object> toEncode){
-        return "l" +toEncode.stream().sorted().map(o -> (encode(o, BencodeType.from(o.getClass().getName())))).collect(Collectors.joining())+"e";
+        StringBuilder builder = new StringBuilder();
+        builder.append("l");
+        toEncode.stream().sorted().forEach(o -> builder.append(encode(o, BencodeType.from(o.getClass().getName()))));
+        builder.append("e");
+        return  builder.toString().getBytes();
     }
     byte[] encodeDic(Map<String, Object> toEncode){
         StringBuilder builder= new StringBuilder();
