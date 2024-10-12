@@ -1,5 +1,5 @@
 import java.io.*;
-import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class BencodeDecode {
@@ -11,13 +11,13 @@ public class BencodeDecode {
 
     public Object decode() throws IOException {
         int prefix = this.input.read();
-        if(Character.isDigit(prefix)){
+        if (Character.isDigit(prefix)) {
             return decodeString(prefix);
-        }else if(prefix == 'i'){
+        } else if (prefix == 'i') {
             return decodeNumber();
-        }else if(prefix =='l'){
+        } else if (prefix == 'l') {
             return decodeList();
-        }else if(prefix =='d'){
+        } else if (prefix == 'd') {
             return decodeMap();
         }else {
             throw new RuntimeException("Only strings are supported at the moment");
@@ -38,9 +38,8 @@ public class BencodeDecode {
         return list;
     }
 
-    private Map<Object, Object> decodeMap() throws IOException{
-        Map<Object, Object> decodeds= new TreeMap<>();
-
+    private Map<String, Object> decodeMap() throws IOException {
+        Map<String, Object> decodedMap = new TreeMap<>();
 
         while (true) {
             int next = this.input.read();
@@ -49,16 +48,16 @@ public class BencodeDecode {
             } else {
                 this.input.unread(next);
                 // Decodificar chave (que sempre será uma string)
-                String key = new String(decodeString(this.input.read()), "UTF-8");
+                String key = new String(decodeString(this.input.read()), StandardCharsets.UTF_8);
                 // Decodificar valor (que pode ser qualquer tipo)
                 Object value = decode();
-                decodeds.put(key, value);
+                decodedMap.put(key, value);
             }
         }
-        return decodeds;
+        return decodedMap;
     }
 
-    private Long decodeNumber() throws IOException{
+    private Long decodeNumber() throws IOException {
         StringBuilder number = new StringBuilder();
         int b;
         while ((b = this.input.read()) != 'e') {
@@ -98,5 +97,4 @@ public class BencodeDecode {
 
         return pieces;
     }
-
 }

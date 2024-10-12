@@ -17,15 +17,15 @@ public class BencodeEncode {
         switch (bencodeDecoded) {
             case String s -> encodeString(s);
             case Number number -> encodeNumber(number);
-            case List list -> encodeList(list);
-            case Map map -> encodeDic(map);
+            case List<?> list -> encodeList(list);
+            case Map<?, ?> map -> encodeDic(map);
             case byte[] bytes -> encodeByteArray(bytes);
             case null, default -> throw new IllegalArgumentException("Tipo de dado não suportado para codificação.");
         }
 
     }
 
-    private void encodeList(List<Object> toEncode) throws IOException {
+    private void encodeList(List<?> toEncode) throws IOException {
         output.write('l');
         for (Object item : toEncode) {
             encode(item);
@@ -33,14 +33,18 @@ public class BencodeEncode {
         output.write('e');
     }
 
-    void encodeDic(Map<String, Object> toEncode) throws IOException {
+    void encodeDic(Map<?, ?> toEncode) throws IOException {
+        // Ordena o dicionário
+        Map<String, Object> sortedDict = new TreeMap<>();
+        for (Map.Entry<?, ?> entry : toEncode.entrySet()) {
+            sortedDict.put(entry.getKey().toString(), entry.getValue());
+        }
 
-        Map<String, Object> sortedDict = new TreeMap<>(toEncode);
+        output.write('d');
         for (Map.Entry<String, Object> entry : sortedDict.entrySet()) {
             encodeString(entry.getKey());
             encode(entry.getValue());
         }
-
         output.write('e');
     }
 
