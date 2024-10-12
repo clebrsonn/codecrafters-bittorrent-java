@@ -1,6 +1,7 @@
 import com.dampcake.bencode.Type;
 import com.google.gson.Gson;
 
+import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,8 +22,12 @@ public class Main {
       if("decode".equals(command)) {
       //  Uncomment this block to pass the first stage
         String bencodedValue = args[1];
+
+
         try {
-          decoded = new BencodeDecode().decode(bencodedValue.getBytes(StandardCharsets.UTF_8));
+            var inputStream= new ByteArrayInputStream(bencodedValue.getBytes(StandardCharsets.UTF_8));
+
+            decoded = new BencodeDecode(inputStream).decode();
         } catch(RuntimeException e) {
           System.out.println(e.getMessage());
           return;
@@ -30,8 +35,8 @@ public class Main {
         System.out.println(gson.toJson(decoded));
     }else if("info".equals(command)) {
         TorrentInputStream torrentInputStream= new TorrentInputStream();
-        byte[] file= torrentInputStream.readFile(args[1]);
-        decoded = new BencodeDecode().decode(file);
+        var file= torrentInputStream.readFile(args[1]);
+        decoded = new BencodeDecode(file).decode();
 
         System.out.println("Tracker URL: " + ((TreeMap<String, Object>) decoded).get("announce"));
         System.out.println("Length: " + ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("length"));
@@ -41,7 +46,7 @@ public class Main {
 //                  (HashMap<String, Object>) bencode.decode(file, Type.DICTIONARY).get("info"))
 //      ));
 
-          System.out.println("Info Hash: " + TorrentInputStream.byteArray2Hex(
+          System.out.println("Info Hash: " + TorrentInputStream.hexToSha1(
                   new BencodeEncode().encode(((TreeMap<String, Object>) decoded).get("info"), BencodeType.DICTIONARY))
           );
           System.out.println("Piece Length: " + ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("piece length"));

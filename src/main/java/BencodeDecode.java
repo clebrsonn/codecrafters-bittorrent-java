@@ -1,81 +1,84 @@
+import java.io.*;
 import java.math.BigDecimal;
 import java.util.*;
 
 public class BencodeDecode {
-    private Integer current=0;
-    public Object decode(byte[] bencodedString){
-        if(Character.isDigit((char) bencodedString[current])){
-            return decodeString(bencodedString);
-        }else if((char) bencodedString[current] == 'i'){
-            return decodeNumber(bencodedString);
-        }else if((char) bencodedString[current] =='l'){
-            return decodeList(bencodedString);
-        }else if((char) bencodedString[current] =='d'){
-            return decodeMap(bencodedString);
+    private final PushbackInputStream input;
+
+    public BencodeDecode(InputStream inputStream) {
+        this.input = new PushbackInputStream(inputStream, 1); // Buffer de 1 byte para pushback
+    }
+
+    public Object decode() throws IOException {
+        int prefix = this.input.read();
+        if(Character.isDigit(prefix)){
+            return decodeString(prefix);
+        }else if(prefix == 'i'){
+            return decodeNumber();
+        }else if(prefix =='l'){
+            return decodeList();
+        }else if(prefix =='d'){
+            return decodeMap();
         }else {
             throw new RuntimeException("Only strings are supported at the moment");
         }
     }
 
-    private List<Object> decodeList(byte[] toDecode){
-        List<Object> decodeds= new ArrayList<>();
-        current++;
-        while ((char) toDecode[current] != 'e'){
-            decodeds.add(decode(toDecode));
+    private List<Object> decodeList() throws IOException {
+        List<Object> list = new ArrayList<>();
+        while (true) {
+            int next = this.input.read();
+            if (next == 'e') {
+                break; // Fim da lista
+            } else {
+                this.input.unread(next); // Reverte o byte lido
+                list.add(decode());
+            }
         }
-        current++;
-        return decodeds;
+        return list;
     }
 
-    private Map<Object, Object> decodeMap(byte[] toDecode){
+    private Map<Object, Object> decodeMap() throws IOException{
         Map<Object, Object> decodeds= new TreeMap<>();
-        current++;
-        while ((char) toDecode[current] != 'e'){
-            decodeds.put(decode(toDecode), decode(toDecode));
+
+
+        while (true) {
+            int next = this.input.read();
+            if (next == 'e') {
+                break; // Fim do dicionário
+            } else {
+                this.input.unread(next);
+                // Decodificar chave (que sempre será uma string)
+                String key = new String(decodeString(this.input.read()), "UTF-8");
+                // Decodificar valor (que pode ser qualquer tipo)
+                Object value = decode();
+                decodeds.put(key, value);
+            }
         }
-        current++;
         return decodeds;
     }
 
-    private Long decodeNumber(byte[] encodedValue) {
-        int start = current + 1, end = 0;
-        StringBuilder buffer = new StringBuilder();
-        for (int i = start; i < encodedValue.length; i++) {
-            if ((char) encodedValue[i] != 'e') {
-                buffer.append((char) encodedValue[i]);
-
-            }else{
-                end =i;
-                break;
-            }
+    private Long decodeNumber() throws IOException{
+        StringBuilder number = new StringBuilder();
+        int b;
+        while ((b = this.input.read()) != 'e') {
+            number.append((char) b);
         }
-        current = end + 1;
-
-        return new BigDecimal(buffer.toString()).longValue();
+        return Long.parseLong(number.toString());
     }
 
-    private String decodeString(byte[] encodedValue) {
-        int delimeterIndex = 0;
-        StringBuilder buffer = new StringBuilder();
-        for (int i = current; i < encodedValue.length; i++) {
-            if ((char)encodedValue[i] != ':') {
-
-                buffer.append((char)encodedValue[i]);
-            }else{
-                delimeterIndex = i;
-                break;
-            }
+    private byte[] decodeString(int firstDigit) throws IOException {
+        StringBuilder lengthStr = new StringBuilder();
+        lengthStr.append((char) firstDigit);
+        int b;
+        while ((b = this.input.read()) != ':') {
+            lengthStr.append((char) b);
         }
-        int length =
-                new BigDecimal(buffer.toString()).intValue();
-        int start = delimeterIndex + 1, end = start + length;
-        current = end;
+        int length = Integer.parseInt(lengthStr.toString());
 
-        StringBuilder buffer2 = new StringBuilder();
-        for (int i = start; i < end; i++) {
-            buffer2.append((char)encodedValue[i]);
-        }
-
-        return buffer2.toString();
+        // Lê os bytes da string
+        byte[] bytes = new byte[length];
+        this.input.read(bytes); // Lê diretamente os bytes da string
+        return bytes;
     }
 }
