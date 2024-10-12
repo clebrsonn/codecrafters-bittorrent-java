@@ -1,48 +1,61 @@
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 public class BencodeEncode {
+    private final OutputStream output;
 
-    public byte[] encode(Object bencodeDecoded, BencodeType type){
+    public BencodeEncode(OutputStream output) {
+        this.output = output;
+    }
 
-        if(BencodeType.LIST.equals(type)){
-            return encodeList((List<Object>)bencodeDecoded);
-        }else if(BencodeType.DICTIONARY.equals(type)){
-            return encodeDic((Map<String, Object>)bencodeDecoded);
-        }if(BencodeType.STRING.equals(type)){
-            return encodeString(bencodeDecoded);
-        }else if(BencodeType.NUMBER.equals(type)){
-            return encodeNumber(bencodeDecoded);
+    public void encode(Object bencodeDecoded) throws IOException {
 
-        }else{
-            throw new RuntimeException("Unknown type");
+        switch (bencodeDecoded) {
+            case String s -> encodeString(s);
+            case Number number -> encodeNumber(number);
+            case List list -> encodeList(list);
+            case Map map -> encodeDic(map);
+            case byte[] bytes -> encodeByteArray(bytes);
+            case null, default -> throw new IllegalArgumentException("Tipo de dado não suportado para codificação.");
         }
 
     }
 
-    byte[] encodeList(List<Object> toEncode){
-        StringBuilder builder = new StringBuilder();
-        builder.append("l");
-        toEncode.stream().sorted().forEach(o -> builder.append(encode(o, BencodeType.from(o.getClass().getName()))));
-        builder.append("e");
-        return  builder.toString().getBytes();
-    }
-    byte[] encodeDic(Map<String, Object> toEncode){
-        StringBuilder builder= new StringBuilder();
-        return ("d" + new TreeMap<>(toEncode).entrySet().stream().map(o -> {
-                    builder.append(encode(o.getKey(), BencodeType.STRING));
-                    builder.append(encode(o.getValue(), BencodeType.from(o.getValue().getClass().getName())));
-                    return builder;
-                }).collect(Collectors.joining())+"e").getBytes();
+    private void encodeList(List<Object> toEncode) throws IOException {
+        output.write('l');
+        for (Object item : toEncode) {
+            encode(item);
+        }
+        output.write('e');
     }
 
-    byte[] encodeString(Object bencodeDecoded){
-     return (((String) bencodeDecoded).length() + ":" + bencodeDecoded).getBytes();
+    void encodeDic(Map<String, Object> toEncode) throws IOException {
+
+        Map<String, Object> sortedDict = new TreeMap<>(toEncode);
+        for (Map.Entry<String, Object> entry : sortedDict.entrySet()) {
+            encodeString(entry.getKey());
+            encode(entry.getValue());
+        }
+
+        output.write('e');
     }
 
-    byte[] encodeNumber(Object bencodeDecoded){
-        return ("i" + bencodeDecoded + "e").getBytes();
+    void encodeString(String bencodeDecoded) throws IOException {
+        byte[] bytes = bencodeDecoded.getBytes(StandardCharsets.UTF_8);
+        output.write((bytes.length + ":").getBytes(StandardCharsets.UTF_8));
+        output.write(bytes);
+    }
+
+    private void encodeByteArray(byte[] bytes) throws IOException {
+        output.write((bytes.length + ":").getBytes(StandardCharsets.UTF_8));
+        output.write(bytes);
+    }
+
+    void encodeNumber(Number bencodeDecoded) throws IOException {
+        output.write(("i" + bencodeDecoded + "e").getBytes(StandardCharsets.UTF_8));
     }
 }

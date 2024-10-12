@@ -2,8 +2,10 @@ import com.dampcake.bencode.Type;
 import com.google.gson.Gson;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.dampcake.bencode.Bencode; //- available if you need it!
 
@@ -13,7 +15,7 @@ public class Main {
   public static void main(String[] args) throws Exception {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     //System.out.println("Logs from your program will appear here!");
-    String command = args[0];
+    String command = "info";//args[0];
       Object decoded;
 
       if("decode".equals(command)) {
@@ -32,7 +34,7 @@ public class Main {
         System.out.println(gson.toJson(decoded));
     }else if("info".equals(command)) {
         TorrentInputStream torrentInputStream= new TorrentInputStream();
-        var file= torrentInputStream.readFile(args[1]);
+        var file= torrentInputStream.readFile("./sample.torrent");//args[1]);
           BencodeDecode bencodeDecode=new BencodeDecode(file);
         decoded = bencodeDecode.decode();
 
@@ -43,14 +45,16 @@ public class Main {
 //          System.out.println("Info Hash: " + TorrentInputStream.byteArray2Hex(bencode.encode(
 //                  (HashMap<String, Object>) bencode.decode(file, Type.DICTIONARY).get("info"))
 //      ));
+          var outputStream = new ByteArrayOutputStream();
+          new BencodeEncode(outputStream).encode((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info"));
 
           System.out.println("Info Hash: " + TorrentInputStream.hexToSha1(
-                  (byte[]) ((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info")).get("piece"))
+                  outputStream.toByteArray())
           );
           System.out.println("Piece Length: " + ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("piece length"));
           List<byte[]> pieceHashes =bencodeDecode.decodePieces((byte[]) ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("pieces"));
 
-          System.out.println("Piece Hashes: " + pieceHashes);
+          System.out.println("Piece Hashes: " + pieceHashes.stream().map(TorrentInputStream::hexToSha1).collect(Collectors.joining("\n")));
 
     } else {
       System.out.println("Unknown command: " + command);

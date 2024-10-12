@@ -1,5 +1,6 @@
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
@@ -12,19 +13,25 @@ public class TorrentInputStream {
         return new FileInputStream(fileName);
     }
 
-    public static String hexToSha1(final byte[] hash) throws NoSuchAlgorithmException {
+    public static String hexToSha1(final byte[] hash)  {
         if(hash == null){
             return null;
         }
-        MessageDigest digest2 = MessageDigest.getInstance("SHA-1");
 
-        var bytes= digest2.digest(hash);
+        try {
+            MessageDigest digest2 = MessageDigest.getInstance("SHA-1");
+            var bytes= digest2.digest(hash);
 
-        return bytesToHex(bytes);
+            return bytesToHex(bytes);
+
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+
 
     }
 
-    public static String bytesToHex(byte[] bytes) {
+    private static String bytesToHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes) {
             sb.append(String.format("%02x", b));
