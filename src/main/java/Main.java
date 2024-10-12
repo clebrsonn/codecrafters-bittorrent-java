@@ -5,6 +5,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.SplittableRandom;
+import java.util.TreeMap;
+
 import com.dampcake.bencode.Bencode; //- available if you need it!
 
 public class Main {
@@ -31,16 +33,19 @@ public class Main {
         byte[] file= torrentInputStream.readFile(args[1]);
         decoded = new BencodeDecode().decode(file);
 
-        System.out.println("Tracker URL: " + ((HashMap<String, Object>) decoded).get("announce"));
-        System.out.println("Length: " + ((HashMap<String, Object>)((HashMap<String, Object>) decoded).get("info")).get("length"));
-        Bencode bencode = new Bencode(true);
+        System.out.println("Tracker URL: " + ((TreeMap<String, Object>) decoded).get("announce"));
+        System.out.println("Length: " + ((TreeMap<String, Object>)((HashMap<String, Object>) decoded).get("info")).get("length"));
+        //Bencode bencode = new Bencode(true);
 
-          System.out.println("Info Hash: " + TorrentInputStream.byteArray2Hex(bencode.encode(
-                  (HashMap<String, Object>) bencode.decode(file, Type.DICTIONARY).get("info"))
-      ));
+//          System.out.println("Info Hash: " + TorrentInputStream.byteArray2Hex(bencode.encode(
+//                  (HashMap<String, Object>) bencode.decode(file, Type.DICTIONARY).get("info"))
+//      ));
 
-          System.out.println("Piece Length: " + ((HashMap<String, Object>)((HashMap<String, Object>) decoded).get("info")).get("piece length"));
-          System.out.println("Piece Hashes: " + ((HashMap<String, Object>)((HashMap<String, Object>) decoded).get("info")).get("pieces"));
+          System.out.println("Info Hash: " + TorrentInputStream.byteArray2Hex(
+                  new BencodeEncode().encode(((TreeMap<String, Object>) decoded).get("info"), BencodeType.DICTIONARY))
+          );
+          System.out.println("Piece Length: " + ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("piece length"));
+          System.out.println("Piece Hashes: " + ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("pieces"));
 
     } else {
       System.out.println("Unknown command: " + command);

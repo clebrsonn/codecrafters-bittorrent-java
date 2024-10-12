@@ -1,5 +1,6 @@
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 public class BencodeEncode {
@@ -30,11 +31,11 @@ public class BencodeEncode {
     }
     byte[] encodeDic(Map<String, Object> toEncode){
         StringBuilder builder= new StringBuilder();
-        return ("d" + toEncode.entrySet().stream().map(o -> {
+        return ("d" + new TreeMap<>(toEncode).entrySet().stream().map(o -> {
                     builder.append(encode(o.getKey(), BencodeType.STRING));
                     builder.append(encode(o.getValue(), BencodeType.from(o.getValue().getClass().getName())));
                     return builder;
-                }).sorted().collect(Collectors.joining())+"e").getBytes();
+                }).collect(Collectors.joining())+"e").getBytes();
     }
 
     byte[] encodeString(Object bencodeDecoded){

@@ -1,8 +1,5 @@
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BencodeDecode {
     private Integer current=0;
@@ -31,7 +28,7 @@ public class BencodeDecode {
     }
 
     private Map<Object, Object> decodeMap(byte[] toDecode){
-        Map<Object, Object> decodeds= new HashMap<>();
+        Map<Object, Object> decodeds= new TreeMap<>();
         current++;
         while ((char) toDecode[current] != 'e'){
             decodeds.put(decode(toDecode), decode(toDecode));
