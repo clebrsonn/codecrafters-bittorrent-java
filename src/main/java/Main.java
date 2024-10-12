@@ -46,7 +46,7 @@ public class Main {
 //                  (HashMap<String, Object>) bencode.decode(file, Type.DICTIONARY).get("info"))
 //      ));
           var outputStream = new ByteArrayOutputStream();
-          new BencodeEncode(outputStream).encode((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info"));
+          new BencodeEncode(outputStream).encodeDic(new TreeMap<>((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info")));
 
           System.out.println("Info Hash: " + TorrentInputStream.hexToSha1(
                   outputStream.toByteArray())
