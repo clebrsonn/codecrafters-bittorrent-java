@@ -13,7 +13,9 @@ public class TorrentInputStream {
     }
 
     public static String hexToSha1(final byte[] hash) throws NoSuchAlgorithmException {
-
+        if(hash == null){
+            return null;
+        }
         MessageDigest digest2 = MessageDigest.getInstance("SHA-1");
 
         var bytes= digest2.digest(hash);

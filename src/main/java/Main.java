@@ -45,7 +45,7 @@ public class Main {
 //      ));
 
           System.out.println("Info Hash: " + TorrentInputStream.hexToSha1(
-                  (byte[]) ((TreeMap<?, ?>) ((TreeMap<String, Object>) decoded).get("info")).get("piece"))
+                  (byte[]) ((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info")).get("piece"))
           );
           System.out.println("Piece Length: " + ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("piece length"));
           List<byte[]> pieceHashes =bencodeDecode.decodePieces((byte[]) ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("pieces"));
