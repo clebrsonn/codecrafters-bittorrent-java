@@ -3,10 +3,7 @@ import com.google.gson.Gson;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.SplittableRandom;
-import java.util.TreeMap;
+import java.util.*;
 
 import com.dampcake.bencode.Bencode; //- available if you need it!
 
@@ -36,7 +33,8 @@ public class Main {
     }else if("info".equals(command)) {
         TorrentInputStream torrentInputStream= new TorrentInputStream();
         var file= torrentInputStream.readFile(args[1]);
-        decoded = new BencodeDecode(file).decode();
+          BencodeDecode bencodeDecode=new BencodeDecode(file);
+        decoded = bencodeDecode.decode();
 
         System.out.println("Tracker URL: " + ((TreeMap<String, Object>) decoded).get("announce"));
         System.out.println("Length: " + ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("length"));
@@ -47,10 +45,12 @@ public class Main {
 //      ));
 
           System.out.println("Info Hash: " + TorrentInputStream.hexToSha1(
-                  new BencodeEncode().encode(((TreeMap<String, Object>) decoded).get("info"), BencodeType.DICTIONARY))
+                  (byte[]) ((TreeMap<?, ?>) ((TreeMap<String, Object>) decoded).get("info")).get("piece"))
           );
           System.out.println("Piece Length: " + ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("piece length"));
-          System.out.println("Piece Hashes: " + ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("pieces"));
+          List<byte[]> pieceHashes =bencodeDecode.decodePieces((byte[]) ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("pieces"));
+
+          System.out.println("Piece Hashes: " + pieceHashes);
 
     } else {
       System.out.println("Unknown command: " + command);

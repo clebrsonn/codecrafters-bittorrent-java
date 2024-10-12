@@ -81,4 +81,22 @@ public class BencodeDecode {
         this.input.read(bytes); // Lê diretamente os bytes da string
         return bytes;
     }
+
+    public static List<byte[]> decodePieces(byte[] piecesBytes) {
+        final int SHA1_LENGTH = 20;
+        List<byte[]> pieces = new ArrayList<>();
+
+        if (piecesBytes.length % SHA1_LENGTH != 0) {
+            throw new IllegalArgumentException("Tamanho do campo `pieces` não é múltiplo de 20 bytes.");
+        }
+
+        for (int i = 0; i < piecesBytes.length; i += SHA1_LENGTH) {
+            byte[] pieceHash = new byte[SHA1_LENGTH];
+            System.arraycopy(piecesBytes, i, pieceHash, 0, SHA1_LENGTH);
+            pieces.add(pieceHash);
+        }
+
+        return pieces;
+    }
+
 }
