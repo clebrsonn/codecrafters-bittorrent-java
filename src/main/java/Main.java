@@ -15,7 +15,7 @@ public class Main {
   public static void main(String[] args) throws Exception {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     //System.out.println("Logs from your program will appear here!");
-    String command = "info";//args[0];
+    String command = args[0];//"info";//args[0];
       Object decoded;
 
       if("decode".equals(command)) {
@@ -34,7 +34,7 @@ public class Main {
         System.out.println(gson.toJson(decoded));
     }else if("info".equals(command)) {
         TorrentInputStream torrentInputStream= new TorrentInputStream();
-        var file= torrentInputStream.readFile("./sample.torrent");//args[1]);
+        var file= torrentInputStream.readFile(args[1]);//"./sample.torrent");//args[1]);
           BencodeDecode bencodeDecode=new BencodeDecode(file);
         decoded = bencodeDecode.decode();
 
