@@ -36,8 +36,8 @@ public class Main {
           BencodeDecode bencodeDecode=new BencodeDecode(file);
         decoded = bencodeDecode.decode();
 
-        System.out.println("Tracker URL: " + ((TreeMap<String, Object>) decoded).get("announce"));
-        System.out.println("Length: " + (char)((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("length"));
+        System.out.println("Tracker URL: " + (char)((TreeMap<String, Object>) decoded).get("announce"));
+        System.out.println("Length: " + ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("length"));
         //Bencode bencode = new Bencode(true);
 
 //          System.out.println("Info Hash: " + TorrentInputStream.byteArray2Hex(bencode.encode(
