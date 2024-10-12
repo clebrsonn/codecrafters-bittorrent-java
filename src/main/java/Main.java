@@ -36,7 +36,7 @@ public class Main {
           BencodeDecode bencodeDecode=new BencodeDecode(file);
         decoded = bencodeDecode.decode();
 
-        System.out.println("Tracker URL: " + (char)((TreeMap<String, Object>) decoded).get("announce"));
+        System.out.println("Tracker URL: " + new String((byte[]) ((TreeMap<String, Object>) decoded).get("announce"), StandardCharsets.UTF_8));
         System.out.println("Length: " + ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("length"));
         //Bencode bencode = new Bencode(true);
 
