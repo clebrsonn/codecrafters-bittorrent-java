@@ -42,27 +42,22 @@ public class Main {
         System.out.println("Length: " + ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("length"));
         Bencode bencode = new Bencode(true);
 
-//          System.out.println("Info Hash: " + TorrentInputStream.byteArray2Hex(bencode.encode(
-//                  (HashMap<String, Object>) bencode.decode(file, Type.DICTIONARY).get("info"))
-//      ));
+          System.out.println("Info Hash: " + TorrentInputStream.hexToSha1(bencode.encode(
+                  (HashMap<String, Object>) bencode.decode(file.readAllBytes(), Type.DICTIONARY).get("info"))
+      ));
           var outputStream = new ByteArrayOutputStream();
           new BencodeEncode(outputStream).encodeDic(new TreeMap<>((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info")));
 
-          System.out.println("Info Hash: " + TorrentInputStream.hexToSha1(
-                  bencode.encode(new TreeMap<>((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info"))))
-          );
           System.out.println("Info Hash2: " + TorrentInputStream.hexToSha1(
                   outputStream.toByteArray())
           );
           System.out.println("Piece Length: " + ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("piece length"));
           List<byte[]> pieceHashes =bencodeDecode.decodePieces((byte[]) ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("pieces"));
+          pieceHashes.forEach(piece -> System.out.println(TorrentInputStream.hexToSha1(piece)));
 
           System.out.println("Piece Hashes:" );
-          pieceHashes.forEach(piece -> {
-              System.out.println();
-              System.out.println(TorrentInputStream.hexToSha1(piece));
 
-          });
+          pieceHashes.forEach(piece -> System.out.println(TorrentInputStream.hexToSha1(piece)));
 
     } else {
       System.out.println("Unknown command: " + command);
