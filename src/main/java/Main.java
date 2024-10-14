@@ -42,13 +42,10 @@ public class Main {
         System.out.println("Length: " + ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("length"));
         Bencode bencode = new Bencode(true);
 
-          System.out.println("Info Hash: " + TorrentInputStream.hexToSha1(bencode.encode(
-                  (Map<String, Object>) bencode.decode(torrentInputStream.readFile(args[1]).readAllBytes(), Type.DICTIONARY).get("info"))
-      ));
           var outputStream = new ByteArrayOutputStream();
           new BencodeEncode(outputStream).encodeDic(new TreeMap<>((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info")));
 
-          System.out.println("Info Hash2: " + TorrentInputStream.hexToSha1(
+          System.out.println("Info Hash: " + TorrentInputStream.hexToSha1(
                   outputStream.toByteArray())
           );
           System.out.println("Piece Length: " + ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("piece length"));
@@ -57,7 +54,7 @@ public class Main {
 
           System.out.println("Piece Hashes:" );
 
-          pieceHashes.forEach(piece -> System.out.println(TorrentInputStream.hexToSha1(piece)));
+          pieceHashes.forEach(piece -> System.out.println(TorrentInputStream.bytesToHex(piece)));
 
     } else {
       System.out.println("Unknown command: " + command);
