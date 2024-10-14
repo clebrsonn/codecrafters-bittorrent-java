@@ -54,7 +54,12 @@ public class Main {
           System.out.println("Piece Length: " + ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("piece length"));
           List<byte[]> pieceHashes =bencodeDecode.decodePieces((byte[]) ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("pieces"));
 
-          System.out.println("Piece Hashes: " + pieceHashes.stream().map(TorrentInputStream::hexToSha1).collect(Collectors.joining("\n")));
+          System.out.println("Piece Hashes:" );
+          pieceHashes.forEach(piece -> {
+              System.out.println();
+              System.out.println(TorrentInputStream.hexToSha1(piece));
+
+          });
 
     } else {
       System.out.println("Unknown command: " + command);
