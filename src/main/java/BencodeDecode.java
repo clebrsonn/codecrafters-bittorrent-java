@@ -1,4 +1,5 @@
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -48,7 +49,7 @@ public class BencodeDecode {
             } else {
                 this.input.unread(next);
                 // Decodificar chave (que sempre será uma string)
-                String key = new String(decodeString(this.input.read()), StandardCharsets.UTF_8);
+                String key = decodeString(this.input.read());
                 // Decodificar valor (que pode ser qualquer tipo)
                 Object value = decode();
                 decodedMap.put(key, value);
@@ -66,7 +67,7 @@ public class BencodeDecode {
         return Long.parseLong(number.toString());
     }
 
-    private byte[] decodeString(int firstDigit) throws IOException {
+    private String decodeString(int firstDigit) throws IOException {
         StringBuilder lengthStr = new StringBuilder();
         lengthStr.append((char) firstDigit);
         int b;
@@ -78,7 +79,7 @@ public class BencodeDecode {
         // Lê os bytes da string
         byte[] bytes = new byte[length];
         this.input.read(bytes); // Lê diretamente os bytes da string
-        return bytes;
+        return new String(bytes, Charset.defaultCharset());
     }
 
     public static List<byte[]> decodePieces(byte[] piecesBytes) {

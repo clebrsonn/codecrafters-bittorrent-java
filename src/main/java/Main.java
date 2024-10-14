@@ -32,6 +32,7 @@ public class Main {
           return;
         }
         System.out.println(gson.toJson(decoded));
+
     }else if("info".equals(command)) {
         TorrentInputStream torrentInputStream= new TorrentInputStream();
         var file= torrentInputStream.readFile(args[1]);//"./sample.torrent");//args[1]);
