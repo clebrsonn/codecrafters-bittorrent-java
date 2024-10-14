@@ -40,7 +40,7 @@ public class Main {
 
         System.out.println("Tracker URL: " + new String((byte[]) ((TreeMap<String, Object>) decoded).get("announce"), StandardCharsets.UTF_8));
         System.out.println("Length: " + ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("length"));
-        //Bencode bencode = new Bencode(true);
+        Bencode bencode = new Bencode(true);
 
 //          System.out.println("Info Hash: " + TorrentInputStream.byteArray2Hex(bencode.encode(
 //                  (HashMap<String, Object>) bencode.decode(file, Type.DICTIONARY).get("info"))
@@ -49,7 +49,7 @@ public class Main {
           new BencodeEncode(outputStream).encodeDic(new TreeMap<>((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info")));
 
           System.out.println("Info Hash: " + TorrentInputStream.hexToSha1(
-                  outputStream.toByteArray())
+                  bencode.encode(new TreeMap<>((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info"))))
           );
           System.out.println("Piece Length: " + ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("piece length"));
           List<byte[]> pieceHashes =bencodeDecode.decodePieces((byte[]) ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("pieces"));
