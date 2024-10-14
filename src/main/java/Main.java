@@ -26,7 +26,7 @@ public class Main {
         try {
             var inputStream= new ByteArrayInputStream(bencodedValue.getBytes(StandardCharsets.UTF_8));
 
-            decoded = new BencodeDecode(inputStream).decode();
+            decoded = new BencodeDecode(inputStream, false).decode();
         } catch(RuntimeException e) {
           System.out.println(e.getMessage());
           return;
@@ -36,7 +36,7 @@ public class Main {
     }else if("info".equals(command)) {
         TorrentInputStream torrentInputStream= new TorrentInputStream();
         var file= torrentInputStream.readFile(args[1]);//"./sample.torrent");//args[1]);
-          BencodeDecode bencodeDecode=new BencodeDecode(file);
+          BencodeDecode bencodeDecode=new BencodeDecode(file, true);
         decoded = bencodeDecode.decode();
 
         System.out.println("Tracker URL: " + ((TreeMap<String, Object>) decoded).get("announce"));

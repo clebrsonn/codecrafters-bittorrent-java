@@ -5,15 +5,17 @@ import java.util.*;
 
 public class BencodeDecode {
     private final PushbackInputStream input;
+    private final Boolean useBytes;
 
-    public BencodeDecode(InputStream inputStream) {
-        this.input = new PushbackInputStream(inputStream, 1); // Buffer de 1 byte para pushback
+    public BencodeDecode(InputStream inputStream, final Boolean useBytes) {
+        this.input = new PushbackInputStream(inputStream, 1);// Buffer de 1 byte para pushback
+        this.useBytes = useBytes;
     }
 
     public Object decode() throws IOException {
         int prefix = this.input.read();
         if (Character.isDigit(prefix)) {
-            return decodeString(prefix);
+            return useBytes ? decodeStringByte(prefix) : decodeString(prefix);
         } else if (prefix == 'i') {
             return decodeNumber();
         } else if (prefix == 'l') {
@@ -67,7 +69,7 @@ public class BencodeDecode {
         return Long.parseLong(number.toString());
     }
 
-    private String decodeString(int firstDigit) throws IOException {
+    private byte[] decodeStringByte(int firstDigit) throws IOException{
         StringBuilder lengthStr = new StringBuilder();
         lengthStr.append((char) firstDigit);
         int b;
@@ -79,7 +81,11 @@ public class BencodeDecode {
         // Lê os bytes da string
         byte[] bytes = new byte[length];
         this.input.read(bytes); // Lê diretamente os bytes da string
-        return new String(bytes, Charset.defaultCharset());
+        return bytes;
+    }
+    private String decodeString(int firstDigit) throws IOException {
+
+        return new String(decodeStringByte(firstDigit), Charset.defaultCharset());
     }
 
     public static List<byte[]> decodePieces(byte[] piecesBytes) {
