@@ -1,6 +1,5 @@
 import java.io.*;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class BencodeDecode {

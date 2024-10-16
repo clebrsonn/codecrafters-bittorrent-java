@@ -1,4 +1,3 @@
-import com.dampcake.bencode.Type;
 import com.google.gson.Gson;
 
 import java.io.ByteArrayInputStream;
@@ -7,7 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.dampcake.bencode.Bencode; //- available if you need it!
+//import com.dampcake.bencode.Bencode; //- available if you need it!
 
 public class Main {
   private static final Gson gson = new Gson();
@@ -41,7 +40,7 @@ public class Main {
 
         System.out.println("Tracker URL: " + new String((byte[]) ((TreeMap<String, Object>) decoded).get("announce"), StandardCharsets.UTF_8));
         System.out.println("Length: " + ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("length"));
-        Bencode bencode = new Bencode(true);
+        //Bencode bencode = new Bencode(true);
 
           var outputStream = new ByteArrayOutputStream();
           new BencodeEncode(outputStream).encodeDic(new TreeMap<>((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info")));
@@ -57,7 +56,25 @@ public class Main {
 
           pieceHashes.forEach(piece -> System.out.println(TorrentInputStream.bytesToHex(piece)));
 
-    } else {
+    }else if("peers".equals(command)){
+          TorrentInputStream torrentInputStream= new TorrentInputStream();
+          var file= torrentInputStream.readFile(args[1]);//"./sample.torrent");//args[1]);
+          BencodeDecode bencodeDecode=new BencodeDecode(file, false);
+          decoded = bencodeDecode.decode();
+          var outputStream = new ByteArrayOutputStream();
+          new BencodeEncode(outputStream).encodeDic(new TreeMap<>((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info")));
+
+          System.out.println(new HttpRequests().get((String) ((TreeMap<String, Object>) decoded).get("announce"), Map.ofEntries(
+                  Map.entry("info_hash",  TorrentInputStream.toSha1(outputStream.toByteArray())),
+                  Map.entry("peer_id",  "cbc-1234567890v4f5t6"),
+                  Map.entry("port",  "6881"),
+                  Map.entry("uploaded",  "0"),
+                  Map.entry("downloaded",  "0"),
+                  Map.entry("left",  (String)((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("length")),
+                  Map.entry("compact",  "1")
+          )));
+
+    }else {
       System.out.println("Unknown command: " + command);
     }
 
