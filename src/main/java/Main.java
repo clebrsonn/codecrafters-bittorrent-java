@@ -2,6 +2,7 @@ import com.google.gson.Gson;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -65,7 +66,7 @@ public class Main {
           new BencodeEncode(outputStream).encodeDic(new TreeMap<>((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info")));
 
           System.out.println(new HttpRequests().get((String) ((TreeMap<String, Object>) decoded).get("announce"), Map.ofEntries(
-                  Map.entry("info_hash", new String(TorrentInputStream.toSha1(outputStream.toByteArray()), StandardCharsets.ISO_8859_1)),
+                  Map.entry("info_hash", URLEncoder.encode(new String(TorrentInputStream.toSha1(outputStream.toByteArray()), StandardCharsets.ISO_8859_1), StandardCharsets.ISO_8859_1)),
                   Map.entry("peer_id",  "cbc-1234567890v4f5t6"),
                   Map.entry("port",  "6881"),
                   Map.entry("uploaded",  "0"),
@@ -79,17 +80,4 @@ public class Main {
     }
 
   }
-
-    private static String toURLEncoded(byte[] hash) {
-        StringBuilder encoded = new StringBuilder();
-
-        for (byte b : hash) {
-            // Para bytes não imprimíveis, usamos %HH
-            encoded.append(String.format("%%%02X", b));
-        }
-
-        return encoded.toString();
-    }
-
-  
 }
