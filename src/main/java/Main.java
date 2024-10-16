@@ -67,7 +67,7 @@ public class Main {
 
           System.out.println(new HttpRequests().get((String) ((TreeMap<String, Object>) decoded).get("announce"), Map.ofEntries(
 
-                  Map.entry("info_hash",toURLEncoded(TorrentInputStream.toSha1(outputStream.toByteArray()))),
+                  Map.entry("info_hash",toURLEncoded(TorrentInputStream.hexToSha1(outputStream.toByteArray()).getBytes(StandardCharsets.ISO_8859_1))),
                   Map.entry("peer_id",  "cbc-1234567890v4f5t6"),
                   Map.entry("port",  "6881"),
                   Map.entry("uploaded",  "0"),
