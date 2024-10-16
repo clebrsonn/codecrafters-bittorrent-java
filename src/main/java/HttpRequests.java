@@ -12,11 +12,13 @@ public class HttpRequests {
     public String get(String url, Map<String, String> params){
         try (HttpClient client = HttpClient.newHttpClient()) {
             StringBuilder builder= new StringBuilder();
-            builder.append(url).append("?1=1");
+            builder.append(url).append("?");
             params.forEach((key, value) -> builder.append("&").append(key).append("=").append(
-                    URLEncoder.encode(value, StandardCharsets.ISO_8859_1)));
+                    URLEncoder.encode(value, StandardCharsets.UTF_8)));
+            System.out.println("url: " + builder.toString());
             HttpRequest request = HttpRequest.newBuilder().uri(URI.create(builder.toString()))
                     .GET().build();
+
 
             return client.send(request, HttpResponse.BodyHandlers.ofString()).body();
         } catch (IOException | InterruptedException e) {
