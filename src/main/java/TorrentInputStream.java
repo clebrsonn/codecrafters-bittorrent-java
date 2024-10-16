@@ -13,7 +13,7 @@ public class TorrentInputStream {
         return new FileInputStream(fileName);
     }
 
-    public static String toSha1(final byte[] hash)  {
+    public static byte[] toSha1(final byte[] hash)  {
         if(hash == null){
             return null;
         }
@@ -22,7 +22,7 @@ public class TorrentInputStream {
             MessageDigest digest2 = MessageDigest.getInstance("SHA-1");
             var bytes= digest2.digest(hash);
 
-            return new String(bytes, StandardCharsets.UTF_8);
+            return bytes;
 
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
@@ -30,15 +30,15 @@ public class TorrentInputStream {
     }
 
     public static String hexToSha1(final byte[] hash){
-        return toSha1(bytesToHex(hash));
+        return bytesToHex(toSha1(hash));
     }
 
-    public static byte[] bytesToHex(byte[] bytes) {
+    public static String bytesToHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes) {
             sb.append(String.format("%02x", b));
         }
-        return sb.toString().getBytes();
+        return sb.toString();
     }
 
 }

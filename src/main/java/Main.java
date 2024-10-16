@@ -65,7 +65,7 @@ public class Main {
           new BencodeEncode(outputStream).encodeDic(new TreeMap<>((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info")));
 
           System.out.println(new HttpRequests().get((String) ((TreeMap<String, Object>) decoded).get("announce"), Map.ofEntries(
-                  Map.entry("info_hash",  TorrentInputStream.toSha1(outputStream.toByteArray())),
+                  Map.entry("info_hash",  new String(TorrentInputStream.toSha1(outputStream.toByteArray()), StandardCharsets.UTF_8)),
                   Map.entry("peer_id",  "cbc-1234567890v4f5t6"),
                   Map.entry("port",  "6881"),
                   Map.entry("uploaded",  "0"),
