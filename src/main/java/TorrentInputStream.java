@@ -20,9 +20,8 @@ public class TorrentInputStream {
 
         try {
             MessageDigest digest2 = MessageDigest.getInstance("SHA-1");
-            var bytes= digest2.digest(hash);
 
-            return bytes;
+            return digest2.digest(hash);
 
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
