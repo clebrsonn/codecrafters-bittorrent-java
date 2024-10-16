@@ -67,7 +67,7 @@ public class Main {
 
           System.out.println(new HttpRequests().get((String) ((TreeMap<String, Object>) decoded).get("announce"), Map.ofEntries(
 
-                  Map.entry("info_hash",new String(TorrentInputStream.toSha1(outputStream.toByteArray()), StandardCharsets.ISO_8859_1)),
+                  Map.entry("info_hash",toURLEncoded(TorrentInputStream.toSha1(outputStream.toByteArray()))),
                   Map.entry("peer_id",  "cbc-1234567890v4f5t6"),
                   Map.entry("port",  "6881"),
                   Map.entry("uploaded",  "0"),
@@ -81,4 +81,16 @@ public class Main {
     }
 
   }
+
+    private static String toURLEncoded(byte[] hash) {
+        StringBuilder encoded = new StringBuilder();
+
+        for (byte b : hash) {
+            // Para bytes não imprimíveis, usamos %HH
+            encoded.append(String.format("%%%02X", b));
+        }
+
+        return encoded.toString();
+    }
+
 }
