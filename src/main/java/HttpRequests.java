@@ -13,9 +13,9 @@ public class HttpRequests {
         try (HttpClient client = HttpClient.newHttpClient()) {
             StringBuilder builder= new StringBuilder();
             builder.append(url).append("?");
-            params.forEach((key, value) -> builder.append(key).append("=").append(
+            params.forEach((key, value) -> builder.append("&").append(key).append("=").append(
                     URLEncoder.encode(value, StandardCharsets.UTF_8)));
-
+            System.out.println("url: " + builder.toString());
             HttpRequest request = HttpRequest.newBuilder().uri(URI.create(builder.toString()))
                     .GET().build();
 
