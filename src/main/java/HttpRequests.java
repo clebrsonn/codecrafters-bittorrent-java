@@ -12,7 +12,7 @@ public class HttpRequests {
     public String get(String url, Map<String, String> params){
         try (HttpClient client = HttpClient.newHttpClient()) {
             StringBuilder builder= new StringBuilder();
-            builder.append(url).append("?");
+            builder.append(url).append("?1=1");
             params.forEach((key, value) -> builder.append("&").append(key).append("=").append(
                     value));
             HttpRequest request = HttpRequest.newBuilder().uri(URI.create(builder.toString()))
