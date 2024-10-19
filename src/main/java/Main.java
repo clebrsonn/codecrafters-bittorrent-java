@@ -77,7 +77,7 @@ public class Main {
                   Map.entry("port",  "6881"),
                   Map.entry("uploaded",  "0"),
                   Map.entry("downloaded",  "0"),
-                  Map.entry("left",  ""+((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("length")),
+                  Map.entry("left",  ""+((Map<String, Object>)((Map<String, Object>) decoded).get("info")).get("length")),
                   Map.entry("compact",  "1")
           )));
 
