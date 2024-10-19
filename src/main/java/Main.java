@@ -64,10 +64,12 @@ public class Main {
           decoded = bencodeDecode.decode();
           var outputStream = new ByteArrayOutputStream();
           new BencodeEncode(outputStream).encodeDic(new TreeMap<>((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info")));
+          byte[] sha1Hash= TorrentInputStream.toSha1(outputStream.toByteArray());
+
 
           System.out.println(new HttpRequests().get((String) ((TreeMap<String, Object>) decoded).get("announce"), Map.ofEntries(
 
-                  Map.entry("info_hash",TorrentInputStream.hexToSha1(outputStream.toByteArray())),
+                  Map.entry("info_hash",Base64.getEncoder().encodeToString(sha1Hash)),
                   Map.entry("peer_id",  "cbc-1234567890v4f5t6"),
                   Map.entry("port",  "6881"),
                   Map.entry("uploaded",  "0"),
