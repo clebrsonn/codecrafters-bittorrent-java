@@ -1,3 +1,4 @@
+import com.dampcake.bencode.Type;
 import com.google.gson.Gson;
 
 import java.io.ByteArrayInputStream;
@@ -7,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
-//import com.dampcake.bencode.Bencode; //- available if you need it!
+import com.dampcake.bencode.Bencode; //- available if you need it!
 
 public class Main {
   private static final Gson gson = new Gson();
@@ -60,11 +61,13 @@ public class Main {
     }else if("peers".equals(command)){
           TorrentInputStream torrentInputStream= new TorrentInputStream();
           var file= torrentInputStream.readFile(args[1]);//"./sample.torrent");//args[1]);
-          BencodeDecode bencodeDecode=new BencodeDecode(file, false);
-          decoded = bencodeDecode.decode();
+          Bencode bencode = new Bencode(true);
+          //BencodeDecode bencodeDecode=new BencodeDecode(file, false);
+          //decoded = bencodeDecode.decode();
           var outputStream = new ByteArrayOutputStream();
-          new BencodeEncode(outputStream).encodeDic(new TreeMap<>((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info")));
-          byte[] sha1Hash= TorrentInputStream.toSha1(outputStream.toByteArray());
+          decoded = bencode.decode(file.readAllBytes(), Type.DICTIONARY);
+          //new BencodeEncode(outputStream).encodeDic(new TreeMap<>((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info")));
+          byte[] sha1Hash= TorrentInputStream.toSha1(bencode.encode((Map<?, ?>) ((Map<?, ?>) decoded).get("info")));
 
 
           System.out.println(new HttpRequests().get((String) ((TreeMap<String, Object>) decoded).get("announce"), Map.ofEntries(
