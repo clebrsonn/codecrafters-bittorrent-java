@@ -69,10 +69,11 @@ public class Main {
           //new BencodeEncode(outputStream).encodeDic(new TreeMap<>((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info")));
           byte[] sha1Hash= TorrentInputStream.toSha1(bencode.encode((Map<?, ?>) ((Map<?, ?>) decoded).get("info")));
 
+          String base64UrlSafe = Base64.getUrlEncoder().withoutPadding().encodeToString(sha1Hash);
 
           System.out.println(new HttpRequests().get( ""+((Map<?, ?>)  decoded).get("announce"), Map.ofEntries(
 
-                  Map.entry("info_hash",URLEncoder.encode(new String(sha1Hash, StandardCharsets.ISO_8859_1), StandardCharsets.ISO_8859_1)),
+                  Map.entry("info_hash",URLEncoder.encode(base64UrlSafe, StandardCharsets.ISO_8859_1)),
                   Map.entry("peer_id",  "cbc-1234567890v4f5t6"),
                   Map.entry("port",  "6881"),
                   Map.entry("uploaded",  "0"),
