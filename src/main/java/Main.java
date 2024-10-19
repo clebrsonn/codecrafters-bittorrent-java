@@ -69,7 +69,7 @@ public class Main {
 
           System.out.println(new HttpRequests().get((String) ((TreeMap<String, Object>) decoded).get("announce"), Map.ofEntries(
 
-                  Map.entry("info_hash",URLEncoder.encode(Base64.getEncoder().encodeToString(sha1Hash))),
+                  Map.entry("info_hash",URLEncoder.encode(new String(sha1Hash))),
                   Map.entry("peer_id",  "cbc-1234567890v4f5t6"),
                   Map.entry("port",  "6881"),
                   Map.entry("uploaded",  "0"),
