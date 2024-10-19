@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.URLEncoder;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -70,8 +71,12 @@ public class Main {
           byte[] sha1Hash= TorrentInputStream.toSha1(bencode.encode((Map<?, ?>) ((Map<?, ?>) decoded).get("info")));
 
           String base64UrlSafe = Base64.getUrlEncoder().withoutPadding().encodeToString(sha1Hash);
+          ByteBuffer buffer = (ByteBuffer) ((Map<?, ?>)  decoded).get("announce");
+          byte[] bytes = new byte[buffer.remaining()];
+          buffer.get(bytes);
 
-          System.out.println(new HttpRequests().get( new String((byte[]) ((Map<?, ?>)  decoded).get("announce"), StandardCharsets.ISO_8859_1), Map.ofEntries(
+
+          System.out.println(new HttpRequests().get( new String(bytes , StandardCharsets.ISO_8859_1), Map.ofEntries(
 
                   Map.entry("info_hash",URLEncoder.encode(base64UrlSafe, StandardCharsets.ISO_8859_1)),
                   Map.entry("peer_id",  "cbc-1234567890v4f5t6"),
