@@ -70,7 +70,7 @@ public class Main {
           byte[] sha1Hash= TorrentInputStream.toSha1(bencode.encode((Map<?, ?>) ((Map<?, ?>) decoded).get("info")));
 
 
-          System.out.println(new HttpRequests().get(new String((byte[]) ((Map<?, ?>)  decoded).get("announce"), StandardCharsets.ISO_8859_1), Map.ofEntries(
+          System.out.println(new HttpRequests().get( ""+((Map<?, ?>)  decoded).get("announce"), Map.ofEntries(
 
                   Map.entry("info_hash",URLEncoder.encode(new String(sha1Hash, StandardCharsets.ISO_8859_1), StandardCharsets.ISO_8859_1)),
                   Map.entry("peer_id",  "cbc-1234567890v4f5t6"),
