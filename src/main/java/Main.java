@@ -71,7 +71,7 @@ public class Main {
 
           String base64UrlSafe = Base64.getUrlEncoder().withoutPadding().encodeToString(sha1Hash);
 
-          System.out.println(new HttpRequests().get( ((Map<?, ?>)  decoded).get("announce").toString(), Map.ofEntries(
+          System.out.println(new HttpRequests().get( new String((byte[]) ((Map<?, ?>)  decoded).get("announce"), StandardCharsets.ISO_8859_1), Map.ofEntries(
 
                   Map.entry("info_hash",URLEncoder.encode(base64UrlSafe, StandardCharsets.ISO_8859_1)),
                   Map.entry("peer_id",  "cbc-1234567890v4f5t6"),
