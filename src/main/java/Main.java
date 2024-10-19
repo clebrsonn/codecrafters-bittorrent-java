@@ -1,10 +1,8 @@
-import com.dampcake.bencode.Type;
 import com.google.gson.Gson;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.URLEncoder;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -62,28 +60,21 @@ public class Main {
     }else if("peers".equals(command)){
           TorrentInputStream torrentInputStream= new TorrentInputStream();
           var file= torrentInputStream.readFile(args[1]);//"./sample.torrent");//args[1]);
-          Bencode bencode = new Bencode(true);
-          //BencodeDecode bencodeDecode=new BencodeDecode(file, false);
-          //decoded = bencodeDecode.decode();
+          BencodeDecode bencodeDecode=new BencodeDecode(file, false);
+          decoded = bencodeDecode.decode();
           var outputStream = new ByteArrayOutputStream();
-          decoded = bencode.decode(file.readAllBytes(), Type.DICTIONARY);
-          //new BencodeEncode(outputStream).encodeDic(new TreeMap<>((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info")));
-          byte[] sha1Hash= TorrentInputStream.toSha1(bencode.encode((Map<?, ?>) ((Map<?, ?>) decoded).get("info")));
-
-          String base64UrlSafe = Base64.getUrlEncoder().withoutPadding().encodeToString(sha1Hash);
-          ByteBuffer buffer = (ByteBuffer) ((Map<?, ?>)  decoded).get("announce");
-          byte[] bytes = new byte[buffer.remaining()];
-          buffer.get(bytes);
+          new BencodeEncode(outputStream).encodeDic(new TreeMap<>((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info")));
+          byte[] sha1Hash= TorrentInputStream.toSha1(outputStream.toByteArray());
 
 
-          System.out.println(new HttpRequests().get( new String(bytes , StandardCharsets.ISO_8859_1), Map.ofEntries(
+          System.out.println(new HttpRequests().get((String) ((TreeMap<String, Object>) decoded).get("announce"), Map.ofEntries(
 
-                  Map.entry("info_hash",URLEncoder.encode(base64UrlSafe, StandardCharsets.ISO_8859_1)),
+                  Map.entry("info_hash",URLEncoder.encode(new String(sha1Hash, StandardCharsets.ISO_8859_1), StandardCharsets.ISO_8859_1)),
                   Map.entry("peer_id",  "cbc-1234567890v4f5t6"),
                   Map.entry("port",  "6881"),
                   Map.entry("uploaded",  "0"),
                   Map.entry("downloaded",  "0"),
-                  Map.entry("left",  ""+((Map<String, Object>)((Map<String, Object>) decoded).get("info")).get("length")),
+                  Map.entry("left",  ""+((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("length")),
                   Map.entry("compact",  "1")
           )));
 
