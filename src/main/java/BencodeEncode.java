@@ -49,17 +49,17 @@ public class BencodeEncode {
     }
 
     void encodeString(String bencodeDecoded) throws IOException {
-        byte[] bytes = bencodeDecoded.getBytes(StandardCharsets.UTF_8);
-        output.write((bytes.length + ":").getBytes(StandardCharsets.UTF_8));
+        byte[] bytes = bencodeDecoded.getBytes(StandardCharsets.ISO_8859_1);
+        output.write((bytes.length + ":").getBytes(StandardCharsets.ISO_8859_1));
         output.write(bytes);
     }
 
     private void encodeByteArray(byte[] bytes) throws IOException {
-        output.write((bytes.length + ":").getBytes(StandardCharsets.UTF_8));
+        output.write((bytes.length + ":").getBytes(StandardCharsets.ISO_8859_1));
         output.write(bytes);
     }
 
     void encodeNumber(Number bencodeDecoded) throws IOException {
-        output.write(("i" + bencodeDecoded + "e").getBytes(StandardCharsets.UTF_8));
+        output.write(("i" + bencodeDecoded + "e").getBytes(StandardCharsets.ISO_8859_1));
     }
 }

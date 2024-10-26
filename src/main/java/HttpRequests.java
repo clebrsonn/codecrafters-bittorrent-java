@@ -18,7 +18,6 @@ public class HttpRequests {
             HttpRequest request = HttpRequest.newBuilder().uri(URI.create(builder.toString()))
                     .GET().build();
 
-
             return client.send(request, HttpResponse.BodyHandlers.ofString()).body();
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
