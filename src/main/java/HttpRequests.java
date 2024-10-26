@@ -87,7 +87,7 @@ public class HttpRequests {
             if (!response.isSuccessful()) {
                 throw new IllegalStateException(responseBody.string());
             }
-            System.out.println(responseBody);
+            System.out.println(new String(responseBody.bytes()));
             try (final var inputStream = responseBody.byteStream()) {
                 final var deserializer = new BencodeDecode(inputStream, true);
                 final var root = (Map<String, Object>) deserializer.decode();
