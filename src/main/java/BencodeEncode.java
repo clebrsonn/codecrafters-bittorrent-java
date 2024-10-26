@@ -12,17 +12,22 @@ public class BencodeEncode {
         this.output = output;
     }
 
-    public void encode(Object bencodeDecoded) throws IOException {
+    public void encode(Object bencodeDecoded) {
+        try {
+            switch (bencodeDecoded) {
 
-        switch (bencodeDecoded) {
-            case String s -> encodeString(s);
-            case Number number -> encodeNumber(number);
-            case List<?> list -> encodeList(list);
-            case Map<?, ?> map -> encodeDic(map);
-            case byte[] bytes -> encodeByteArray(bytes);
-            case null, default -> throw new IllegalArgumentException("Tipo de dado não suportado para codificação.");
+                case String s -> encodeString(s);
+
+                    case Number number -> encodeNumber(number);
+                    case List<?> list -> encodeList(list);
+                    case Map<?, ?> map -> encodeDic(map);
+                    case byte[] bytes -> encodeByteArray(bytes);
+                    case null, default ->
+                            throw new IllegalArgumentException("Tipo de dado não suportado para codificação.");
+            }
+        }catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
     }
 
     private void encodeList(List<?> toEncode) throws IOException {

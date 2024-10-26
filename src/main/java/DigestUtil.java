@@ -13,15 +13,19 @@ public class DigestUtil {
         return new FileInputStream(fileName);
     }
 
-    @SneakyThrows
     public static byte[] toSha1(final byte[] hash)  {
         if(hash == null){
             return null;
         }
 
-        MessageDigest digest2 = MessageDigest.getInstance("SHA-1");
 
-        return digest2.digest(hash);
+        try {
+            MessageDigest digest2 = MessageDigest.getInstance("SHA-1");
+            return digest2.digest(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+
 
     }
 
@@ -29,7 +33,6 @@ public class DigestUtil {
         return bytesToHex(toSha1(hash));
     }
 
-    @SneakyThrows
     public static byte[] shaInfo(final Object infoRoot) {
         final var infoOutputStream = new ByteArrayOutputStream();
         new BencodeEncode(infoOutputStream).encode(infoRoot);
