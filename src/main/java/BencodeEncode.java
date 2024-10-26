@@ -30,7 +30,7 @@ public class BencodeEncode {
                 case List<?> list -> encodeList(list);
                 case Map<?, ?> map -> encodeDic(map);
                 default ->
-                        throw new UnsupportedOperationException("Tipo de dado não suportado para codificação: " + root.getClass());
+                        throw new UnsupportedOperationException("Tipo de dado não suportado para codificação: " + root.getClass().getName());
             }
 
         }catch (IOException e) {
