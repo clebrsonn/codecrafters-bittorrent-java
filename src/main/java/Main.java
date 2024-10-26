@@ -52,16 +52,7 @@ public class Main {
           decoded = bencodeDecode.decode();
           final var torrent = Torrent.of((TreeMap<String, Object>) decoded);
 
-          System.out.println(new HttpRequests().get(torrent.announce(), Map.ofEntries(
-
-                  Map.entry("info_hash",URLEncoder.encode(new String(torrent.info().hash(), StandardCharsets.ISO_8859_1), StandardCharsets.ISO_8859_1)),
-                  Map.entry("peer_id",  "cbsc1234567890v4f5t6"),
-                  Map.entry("port",  "6881"),
-                  Map.entry("uploaded",  "0"),
-                  Map.entry("downloaded",  "0"),
-                  Map.entry("left",  ""+torrent.info().length()),
-                  Map.entry("compact",  "1")
-          )));
+          System.out.println(new HttpRequests().get(torrent));
 
     }else {
       System.out.println("Unknown command: " + command);
