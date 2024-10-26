@@ -49,10 +49,10 @@ public class Main {
               DigestUtil digestUtil = new DigestUtil();
               var file = digestUtil.readFile(args[1]);
               var ben= new Bencode(true);
-              var ddec= ben.decode(file.readAllBytes(), Type.DICTIONARY);
-              //BencodeDecode bencodeDecode = new BencodeDecode(file, false);
-              //decoded = bencodeDecode.decode();
-              AnnounceResponse returned= new HttpRequests().get(ddec);
+              //var ddec= ben.decode(file.readAllBytes(), Type.DICTIONARY);
+              BencodeDecode bencodeDecode = new BencodeDecode(file);
+              decoded = bencodeDecode.parse();
+              AnnounceResponse returned= new HttpRequests().get(Torrent.of((Map<String, Object>) decoded));
 
               System.out.println(returned.peers());
 
