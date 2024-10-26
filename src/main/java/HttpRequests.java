@@ -53,7 +53,7 @@ public class HttpRequests {
 
     }
 
-    public Torrent get(Map<String,Object> torrent) throws IOException{
+    public AnnounceResponse get(Map<String,Object> torrent) throws IOException{
         final Request request;
         Map<String, Object> info= (Map<String, Object>) torrent.get("info");
         Bencode ben = new Bencode(true);
@@ -90,8 +90,9 @@ public class HttpRequests {
 
             try (final var inputStream = responseBody.byteStream()) {
                 final var deserializer = new BencodeDecode(inputStream, true);
-                final var root = deserializer.decode();
-                return Torrent.of((Map<String, Object>) root);
+                final var root = (Map<String, Object>) deserializer.decode();
+
+                return AnnounceResponse.of(root);
             }
         }
 
