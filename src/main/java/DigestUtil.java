@@ -33,7 +33,11 @@ public class DigestUtil {
 
     public static byte[] shaInfo(final Object infoRoot) {
         final var infoOutputStream = new ByteArrayOutputStream();
-        new BencodeEncode(infoOutputStream).encode(infoRoot);
+        try {
+            new BencodeEncode().write(infoRoot,infoOutputStream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         return toSha1(infoOutputStream.toByteArray());
     }

@@ -1,12 +1,11 @@
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 public class BencodeEncode {
-    private final OutputStream output;
 
     public static final byte INTEGER_BYTE = 'i';
     public static final byte COLON_BYTE = ':';
@@ -14,73 +13,60 @@ public class BencodeEncode {
     public static final byte LIST_BYTE = 'l';
     public static final byte MAP_BYTE = 'd';
 
-    public BencodeEncode(OutputStream output) {
-        this.output = output;
+    public byte[] writeAsBytes(Object root) throws IOException {
+        final var byteArrayOutputStream = new ByteArrayOutputStream();
+        write(root, byteArrayOutputStream);
+
+        return byteArrayOutputStream.toByteArray();
     }
 
-    public void encode(Object root) {
-        try {
-
-            switch (root) {
-                case String string -> encodeString(string);
-                case Long number -> encodeNumber(number);
-                case Integer number -> encodeNumber(Integer.toUnsignedLong(number));
-                case Short number -> encodeNumber(Short.toUnsignedInt(number));
-                case Byte number -> encodeNumber(Byte.toUnsignedInt(number));
-                case List<?> list -> encodeList(list);
-                case Map<?, ?> map -> encodeDic(map);
-                case byte[] bytes -> encodeByteArray(bytes);
-                default ->
-                        throw new UnsupportedOperationException("Tipo de dado não suportado para codificação: " + root.getClass().getName());
-            }
-
-        }catch (IOException e) {
-            throw new RuntimeException(e);
+    public void write(Object root, OutputStream outputStream) throws IOException {
+        switch (root) {
+            case String string -> writeString(string, outputStream);
+            case Long number -> writeNumber(number, outputStream);
+            case Integer number -> writeNumber(Integer.toUnsignedLong(number), outputStream);
+            case Short number -> writeNumber(Short.toUnsignedInt(number), outputStream);
+            case Byte number -> writeNumber(Byte.toUnsignedInt(number), outputStream);
+            case List<?> list -> writeList(list, outputStream);
+            case Map<?, ?> map -> writeMap(map, outputStream);
+            case null, default -> throw new UnsupportedOperationException("unsupported type: " + root.getClass());
         }
     }
 
-    private void encodeList(List<?> toEncode) throws IOException {
-        output.write(LIST_BYTE);
-
-        for (final var element : toEncode) {
-            encode(element);
-        }
-
-        output.write(END_BYTE);
+    public void writeString(String string, OutputStream outputStream) throws IOException {
+        outputStream.write(String.valueOf(string.length()).getBytes());
+        outputStream.write(COLON_BYTE);
+        outputStream.write(string.getBytes(StandardCharsets.ISO_8859_1));
     }
 
-    void encodeDic(Map<?, ?> toEncode) throws IOException {
-        // Ordena o dicionário
-        output.write(MAP_BYTE);
+    public void writeNumber(long number, OutputStream outputStream) throws IOException {
+        outputStream.write(INTEGER_BYTE);
+        outputStream.write(String.valueOf(number).getBytes());
+        outputStream.write(END_BYTE);
+    }
 
-        for (final var entry : toEncode.entrySet()) {
+    public void writeList(List<?> list, OutputStream outputStream) throws IOException {
+        outputStream.write(LIST_BYTE);
+
+        for (final var element : list) {
+            write(element, outputStream);
+        }
+
+        outputStream.write(END_BYTE);
+    }
+
+    public void writeMap(Map<?, ?> map, OutputStream outputStream) throws IOException {
+        outputStream.write(MAP_BYTE);
+
+        for (final var entry : map.entrySet()) {
             final var key = entry.getKey();
             final var value = entry.getValue();
 
-            encodeString((String) key);
-            encode(value);
-
+            writeString((String) key, outputStream);
+            write(value, outputStream);
         }
 
-        output.write(END_BYTE);
+        outputStream.write(END_BYTE);
     }
 
-    void encodeString(String bencodeDecoded) throws IOException {
-        output.write(String.valueOf(bencodeDecoded.length()).getBytes());
-        output.write(COLON_BYTE);
-        output.write(bencodeDecoded.getBytes(StandardCharsets.ISO_8859_1));
-    }
-
-    private void encodeByteArray(byte[] bytes) throws IOException {
-        output.write(bytes.length);
-        output.write(COLON_BYTE);
-
-        output.write(bytes);
-    }
-
-    void encodeNumber(Number bencodeDecoded) throws IOException {
-        output.write(INTEGER_BYTE);
-        output.write(String.valueOf(bencodeDecoded).getBytes());
-        output.write(END_BYTE);
-    }
 }

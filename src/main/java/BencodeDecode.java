@@ -1,90 +1,133 @@
-import java.io.*;
-import java.nio.charset.Charset;
-import java.util.*;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class BencodeDecode {
-    private final PushbackInputStream input;
-    private final Boolean useBytes;
 
-    public BencodeDecode(InputStream inputStream, final Boolean useBytes) {
-        this.input = new PushbackInputStream(inputStream, 1);// Buffer de 1 byte para pushback
-        this.useBytes = useBytes;
+    private final InputStream inputStream;
+
+    public BencodeDecode(String input) {
+        this(new ByteArrayInputStream(input.getBytes()));
     }
 
-    public Object decode() throws IOException {
-        int prefix = this.input.read();
-        if (Character.isDigit(prefix)) {
-            return useBytes ? decodeStringByte(prefix) : decodeString(prefix);
-        } else if (prefix == BencodeEncode.INTEGER_BYTE) {
-            return decodeNumber();
-        } else if (prefix == BencodeEncode.LIST_BYTE) {
-            return decodeList();
-        } else if (prefix == BencodeEncode.MAP_BYTE) {
-            return decodeMap();
-        }else {
-            throw new RuntimeException("Only strings are supported at the moment");
-        }
+    public BencodeDecode(byte[] input) {
+        this(new ByteArrayInputStream(input));
     }
 
-    private List<Object> decodeList() throws IOException {
-        List<Object> list = new ArrayList<>();
-        while (true) {
-            int next = this.input.read();
-            if (next == BencodeEncode.END_BYTE) {
-                break; // Fim da lista
-            } else {
-                this.input.unread(next); // Reverte o byte lido
-                list.add(decode());
-            }
+    public BencodeDecode(InputStream inputStream) {
+        if (!inputStream.markSupported()) {
+            inputStream = new BufferedInputStream(inputStream);
         }
+
+        this.inputStream = inputStream;
+    }
+
+    public List<Object> parseMultiple() throws IOException {
+        final var objects = new ArrayList<Object>();
+
+        int first;
+        while ((first = peek()) != -1) {
+            objects.add(doParse(first));
+        }
+
+        return objects;
+    }
+
+    public Object parse() throws IOException {
+        return doParse(peek());
+    }
+
+    private Object doParse(final int first) throws IOException {
+        if (Character.isDigit(first)) {
+            return parseString();
+        }
+
+        if ('i' == first) {
+            return parseNumber();
+        }
+
+        if ('l' == first) {
+            return parseList();
+        }
+
+        if ('d' == first) {
+            return parseMap();
+        }
+
+        throw new UnsupportedOperationException("unknown character: " + (char) first);
+    }
+
+    private String parseString() throws IOException {
+        final var length = Integer.parseInt(readUntil(':'));
+        final var bytes = inputStream.readNBytes(length);
+
+        return new String(bytes, StandardCharsets.ISO_8859_1);
+    }
+
+    private long parseNumber() throws IOException {
+        inputStream.read(); /* ignore i */
+
+        return Long.parseLong(readUntil('e'));
+    }
+
+    private List<Object> parseList() throws IOException {
+        inputStream.read(); /* ignore l */
+
+        final var list = new ArrayList<Object>();
+
+        int next;
+        while ((next = peek()) != 'e' && next != -1) {
+            list.add(parse());
+        }
+
+        inputStream.read(); /* ignore e */
         return list;
     }
 
-    private Map<String, Object> decodeMap() throws IOException {
-        Map<String, Object> decodedMap = new TreeMap<>();
+    private Map<String, Object> parseMap() throws IOException {
+        inputStream.read(); /* ignore d */
 
-        while (true) {
-            int next = this.input.read();
-            if (next == BencodeEncode.END_BYTE) {
-                break; // Fim do dicionário
-            } else {
-                this.input.unread(next);
-                // Decodificar chave (que sempre será uma string)
-                String key = decodeString(this.input.read());
-                // Decodificar valor (que pode ser qualquer tipo)
-                Object value = decode();
-                decodedMap.put(key, value);
+        final var map = new TreeMap<String, Object>();
+
+        int next;
+        while ((next = peek()) != 'e' && next != -1) {
+            final var key = parseString();
+            final var value = parse();
+
+            map.put(key, value);
+        }
+
+        inputStream.read(); /* ignore e */
+        return map;
+    }
+
+    private String readUntil(char end) throws IOException {
+        final var builder = new StringBuilder();
+
+        int value;
+        while ((value = inputStream.read()) != -1) {
+            if (end == value) {
+                break;
             }
+
+            builder.append((char) value);
         }
-        return decodedMap;
+
+        return builder.toString();
     }
 
-    private Long decodeNumber() throws IOException {
-        StringBuilder number = new StringBuilder();
-        int b;
-        while ((b = this.input.read()) != BencodeEncode.END_BYTE) {
-            number.append((char) b);
-        }
-        return Long.parseLong(number.toString());
-    }
-
-    private byte[] decodeStringByte(int firstDigit) throws IOException{
-        StringBuilder lengthStr = new StringBuilder();
-        lengthStr.append((char) firstDigit);
-        int b;
-        while ((b = this.input.read()) != BencodeEncode.COLON_BYTE) {
-            lengthStr.append((char) b);
-        }
-        int length = Integer.parseInt(lengthStr.toString());
-
-        // Lê os bytes da string
-        byte[] bytes = new byte[length];
-        this.input.read(bytes); // Lê diretamente os bytes da string
-        return bytes;
-    }
-    private String decodeString(int firstDigit) throws IOException {
-
-        return new String(decodeStringByte(firstDigit), Charset.defaultCharset());
+    private int peek() throws IOException {
+        inputStream.mark(1);
+        final var value = inputStream.read();
+        inputStream.reset();
+        return value;
     }
 
 }

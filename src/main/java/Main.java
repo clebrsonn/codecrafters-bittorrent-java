@@ -23,15 +23,15 @@ public class Main {
 
               var inputStream = new ByteArrayInputStream(bencodedValue.getBytes(StandardCharsets.UTF_8));
 
-              decoded = new BencodeDecode(inputStream, false).decode();
+              decoded = new BencodeDecode(inputStream).parse();
 
               System.out.println(gson.toJson(decoded));
           }
           case "info" -> {
               DigestUtil digestUtil = new DigestUtil();
               var file = digestUtil.readFile(args[1]);
-              BencodeDecode bencodeDecode = new BencodeDecode(file, true);
-              decoded = bencodeDecode.decode();
+              BencodeDecode bencodeDecode = new BencodeDecode(file);
+              decoded = bencodeDecode.parse();
               final var torrent = Torrent.of((TreeMap<String, Object>) decoded);
 
               System.out.println("Tracker URL: " + torrent.announce());

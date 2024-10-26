@@ -44,8 +44,8 @@ public class HttpRequests {
             }
 
             try (final var inputStream = responseBody.byteStream()) {
-                final var deserializer = new BencodeDecode(inputStream, false);
-                final var root = deserializer.decode();
+                final var deserializer = new BencodeDecode(inputStream);
+                final var root = deserializer.parse();
 
                 return root.toString();
             }
@@ -88,8 +88,8 @@ public class HttpRequests {
                 throw new IllegalStateException(responseBody.string());
             }
             try (final var inputStream = responseBody.byteStream()) {
-                final var deserializer = new BencodeDecode(inputStream, true);
-                final var root = (Map<String, Object>) deserializer.decode();
+                final var deserializer = new BencodeDecode(inputStream);
+                final var root = (Map<String, Object>) deserializer.parse();
 
                 return AnnounceResponse.of(root);
             }
