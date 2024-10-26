@@ -2,7 +2,6 @@ import com.dampcake.bencode.Bencode;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -54,7 +53,7 @@ public class HttpRequests {
 
     }
 
-    public String get(Map<String,Object> torrent) throws IOException{
+    public Object get(Map<String,Object> torrent) throws IOException{
         final Request request;
         Map<String, Object> info= (Map<String, Object>) torrent.get("info");
         Bencode ben = new Bencode(true);
@@ -93,7 +92,7 @@ public class HttpRequests {
                 final var deserializer = new BencodeDecode(inputStream, false);
                 final var root = deserializer.decode();
 
-                return root.toString();
+                return root;
             }
         }
 
