@@ -52,11 +52,9 @@ public class Main {
           decoded = bencodeDecode.decode();
           final var torrent = Torrent.of((TreeMap<String, Object>) decoded);
 
-          byte[] sha1Hash= DigestUtil.toSha1(torrent.info().hash());
-
           System.out.println(new HttpRequests().get(torrent.announce(), Map.ofEntries(
 
-                  Map.entry("info_hash",URLEncoder.encode(new String(sha1Hash, StandardCharsets.ISO_8859_1), StandardCharsets.ISO_8859_1)),
+                  Map.entry("info_hash",URLEncoder.encode(new String(torrent.info().hash(), StandardCharsets.ISO_8859_1), StandardCharsets.ISO_8859_1)),
                   Map.entry("peer_id",  "cbsc1234567890v4f5t6"),
                   Map.entry("port",  "6881"),
                   Map.entry("uploaded",  "0"),
