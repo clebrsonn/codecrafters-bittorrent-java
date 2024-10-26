@@ -5,9 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
-
-import com.dampcake.bencode.Bencode; //- available if you need it!
 
 public class Main {
   private static final Gson gson = new Gson();
@@ -34,8 +31,8 @@ public class Main {
         System.out.println(gson.toJson(decoded));
 
     }else if("info".equals(command)) {
-        TorrentInputStream torrentInputStream= new TorrentInputStream();
-        var file= torrentInputStream.readFile(args[1]);//"./sample.torrent");//args[1]);
+        DigestUtil digestUtil = new DigestUtil();
+        var file= digestUtil.readFile(args[1]);//"./sample.torrent");//args[1]);
           BencodeDecode bencodeDecode=new BencodeDecode(file, true);
         decoded = bencodeDecode.decode();
 
@@ -46,34 +43,34 @@ public class Main {
           var outputStream = new ByteArrayOutputStream();
           new BencodeEncode(outputStream).encodeDic(new TreeMap<>((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info")));
 
-          System.out.println("Info Hash: " + TorrentInputStream.hexToSha1(
+          System.out.println("Info Hash: " + DigestUtil.hexToSha1(
                   outputStream.toByteArray())
           );
           System.out.println("Piece Length: " + ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("piece length"));
           List<byte[]> pieceHashes =bencodeDecode.decodePieces((byte[]) ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("pieces"));
-          //pieceHashes.forEach(piece -> System.out.println(TorrentInputStream.hexToSha1(piece)));
+          //pieceHashes.forEach(piece -> System.out.println(DigestUtil.hexToSha1(piece)));
 
           System.out.println("Piece Hashes:" );
 
-          pieceHashes.forEach(piece -> System.out.println(TorrentInputStream.bytesToHex(piece)));
+          pieceHashes.forEach(piece -> System.out.println(DigestUtil.bytesToHex(piece)));
 
     }else if("peers".equals(command)){
-          TorrentInputStream torrentInputStream= new TorrentInputStream();
-          var file= torrentInputStream.readFile(args[1]);//"./sample.torrent");//args[1]);
+          DigestUtil digestUtil = new DigestUtil();
+          var file= digestUtil.readFile(args[1]);//"./sample.torrent");//args[1]);
           BencodeDecode bencodeDecode=new BencodeDecode(file, false);
           decoded = bencodeDecode.decode();
-          var outputStream = new ByteArrayOutputStream();
-          new BencodeEncode(outputStream).encodeDic(new TreeMap<>((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info")));
-          byte[] sha1Hash= TorrentInputStream.toSha1(outputStream.toByteArray());
+          final var torrent = Torrent.of((TreeMap<String, Object>) decoded);
 
-          System.out.println(new HttpRequests().get((String) ((TreeMap<String, Object>) decoded).get("announce"), Map.ofEntries(
+          byte[] sha1Hash= DigestUtil.toSha1(torrent.info().hash());
 
-                  Map.entry("info_hash",URLEncoder.encode(new String(sha1Hash, StandardCharsets.ISO_8859_1), StandardCharsets.ISO_8859_1.name())),
+          System.out.println(new HttpRequests().get(torrent.announce(), Map.ofEntries(
+
+                  Map.entry("info_hash",URLEncoder.encode(new String(sha1Hash, StandardCharsets.ISO_8859_1), StandardCharsets.ISO_8859_1)),
                   Map.entry("peer_id",  "cbsc1234567890v4f5t6"),
                   Map.entry("port",  "6881"),
                   Map.entry("uploaded",  "0"),
                   Map.entry("downloaded",  "0"),
-                  Map.entry("left",  ""+((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("length")),
+                  Map.entry("left",  ""+torrent.info().length()),
                   Map.entry("compact",  "1")
           )));
 

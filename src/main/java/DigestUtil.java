@@ -1,36 +1,40 @@
+import lombok.SneakyThrows;
+
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Formatter;
 import java.util.HexFormat;
 
-public class TorrentInputStream {
+public class DigestUtil {
 
     public FileInputStream readFile(final String fileName) throws IOException {
         return new FileInputStream(fileName);
     }
 
+    @SneakyThrows
     public static byte[] toSha1(final byte[] hash)  {
         if(hash == null){
             return null;
         }
 
-        try {
-            MessageDigest digest2 = MessageDigest.getInstance("SHA-1");
+        MessageDigest digest2 = MessageDigest.getInstance("SHA-1");
 
-            return digest2.digest(hash);
+        return digest2.digest(hash);
 
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public static String hexToSha1(final byte[] hash){
         return bytesToHex(toSha1(hash));
+    }
+
+    @SneakyThrows
+    public static byte[] shaInfo(final Object infoRoot) {
+        final var infoOutputStream = new ByteArrayOutputStream();
+        new BencodeEncode(infoOutputStream).encode(infoRoot);
+
+        return toSha1(infoOutputStream.toByteArray());
     }
 
     public static String bytesToHex(byte[] bytes) {
