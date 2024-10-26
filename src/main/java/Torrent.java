@@ -1,4 +1,3 @@
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public record Torrent(String announce, TorrentInfo info) {

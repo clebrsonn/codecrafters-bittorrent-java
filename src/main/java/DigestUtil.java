@@ -8,11 +8,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
 public class DigestUtil {
-
-    public FileInputStream readFile(final String fileName) throws IOException {
-        return new FileInputStream(fileName);
-    }
-
     public static byte[] toSha1(final byte[] hash)  {
         if(hash == null){
             return null;
@@ -27,10 +22,6 @@ public class DigestUtil {
 
     }
 
-    public static String hexToSha1(final byte[] hash){
-        return bytesToHex(toSha1(hash));
-    }
-
     public static byte[] shaInfo(final Object infoRoot) {
         final var infoOutputStream = new ByteArrayOutputStream();
         try {
@@ -38,7 +29,6 @@ public class DigestUtil {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
         return toSha1(infoOutputStream.toByteArray());
     }
 

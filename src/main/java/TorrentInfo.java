@@ -9,6 +9,7 @@ public record TorrentInfo(byte[] hash,
                           String name,
                           int pieceLength,
                           List<byte[]> pieces) {
+
     public static TorrentInfo of(Map<String, Object> root) {
         final var hash = DigestUtil.shaInfo(root);
         final var length = (long) root.getOrDefault("length", -1L);
