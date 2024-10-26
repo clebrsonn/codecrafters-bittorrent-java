@@ -1,3 +1,4 @@
+import com.dampcake.bencode.Bencode;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -56,6 +57,8 @@ public class HttpRequests {
     public String get(Map<String,Object> torrent) throws IOException{
         final Request request;
         Map<String, Object> info= (Map<String, Object>) torrent.get("info");
+        Bencode ben = new Bencode(true);
+        byte[] forHash= ben.encode(info);
         try {
             request = new Request.Builder()
                     .get()
@@ -64,7 +67,7 @@ public class HttpRequests {
                                     ((ByteBuffer)(torrent.get("announce"))).array()
                                     ))
                                     .newBuilder()
-                                    .addEncodedQueryParameter("info_hash", URLEncoder.encode(new String(DigestUtil.shaInfo(info), StandardCharsets.ISO_8859_1), StandardCharsets.ISO_8859_1.name()))
+                                    .addEncodedQueryParameter("info_hash", URLEncoder.encode(new String(DigestUtil.toSha1(forHash), StandardCharsets.ISO_8859_1), StandardCharsets.ISO_8859_1.name()))
                                     .addQueryParameter("peer_id", "cbc12233445566778899")
                                     .addQueryParameter("port", String.valueOf(6881))
                                     .addQueryParameter("uploaded", "0")
