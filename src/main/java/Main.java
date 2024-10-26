@@ -30,7 +30,7 @@ public class Main {
           case "info" -> {
               DigestUtil digestUtil = new DigestUtil();
               var file = digestUtil.readFile(args[1]);
-              BencodeDecode bencodeDecode = new BencodeDecode(file, true);
+              BencodeDecode bencodeDecode = new BencodeDecode(file, false);
               decoded = bencodeDecode.decode();
               final var torrent = Torrent.of((TreeMap<String, Object>) decoded);
 
