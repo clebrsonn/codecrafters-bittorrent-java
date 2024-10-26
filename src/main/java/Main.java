@@ -50,8 +50,8 @@ public class Main {
               var file = digestUtil.readFile(args[1]);
               var ben= new Bencode(true);
               var ddec= ben.decode(file.readAllBytes(), Type.DICTIONARY);
-              BencodeDecode bencodeDecode = new BencodeDecode(file, false);
-              decoded = bencodeDecode.decode();
+              //BencodeDecode bencodeDecode = new BencodeDecode(file, false);
+              //decoded = bencodeDecode.decode();
               final var torrent = Torrent.of(ddec);
 
               System.out.println(new HttpRequests().get(torrent));
