@@ -1,3 +1,5 @@
+import com.dampcake.bencode.Bencode;
+import com.dampcake.bencode.Type;
 import com.google.gson.Gson;
 
 import java.io.ByteArrayInputStream;
@@ -46,9 +48,11 @@ public class Main {
           case "peers" -> {
               DigestUtil digestUtil = new DigestUtil();
               var file = digestUtil.readFile(args[1]);
+              var ben= new Bencode(true);
+              var ddec= ben.decode(file.readAllBytes(), Type.DICTIONARY);
               BencodeDecode bencodeDecode = new BencodeDecode(file, false);
               decoded = bencodeDecode.decode();
-              final var torrent = Torrent.of((TreeMap<String, Object>) decoded);
+              final var torrent = Torrent.of(ddec);
 
               System.out.println(new HttpRequests().get(torrent));
 
