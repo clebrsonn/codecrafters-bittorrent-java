@@ -16,7 +16,7 @@ public record TorrentInfo(byte[] hash,
         final var name = new String((byte[]) root.get("name"), StandardCharsets.ISO_8859_1);
         final var pieceLength = (int) (long) root.get("piece length");
 
-        final var pieceHashes = ((String) root.get("pieces")).getBytes(StandardCharsets.ISO_8859_1);
+        final var pieceHashes = ((byte[]) root.get("pieces"));
         final var pieces = new ArrayList<byte[]>();
         for (var start = 0; start < pieceHashes.length; start += 20) {
             final var piece = Arrays.copyOfRange(pieceHashes, start, start + 20);
