@@ -29,6 +29,7 @@ public class BencodeEncode {
                 case Byte number -> encodeNumber(Byte.toUnsignedInt(number));
                 case List<?> list -> encodeList(list);
                 case Map<?, ?> map -> encodeDic(map);
+                case byte[] bytes -> encodeByteArray(bytes);
                 default ->
                         throw new UnsupportedOperationException("Tipo de dado não suportado para codificação: " + root.getClass().getName());
             }
@@ -57,8 +58,6 @@ public class BencodeEncode {
             final var value = entry.getValue();
 
             encodeString((String) key);
-            System.out.println("key: " + key);
-            System.out.println("key: " + value);
             encode(value);
 
         }
