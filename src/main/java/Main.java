@@ -37,7 +37,7 @@ public class Main {
               System.out.println("Tracker URL: " + torrent.announce());
               System.out.println("Length: " + torrent.info().length());
 
-              System.out.println("Info Hash: " + new String(torrent.info().hash(), StandardCharsets.ISO_8859_1));
+              System.out.println("Info Hash: " + DigestUtil.bytesToHex(torrent.info().hash()));
               System.out.println("Piece Length: " + torrent.info().pieceLength());
 
               System.out.println("Piece Hashes:");
