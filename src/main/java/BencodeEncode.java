@@ -29,8 +29,8 @@ public class BencodeEncode {
                 case Byte number -> encodeNumber(Byte.toUnsignedInt(number));
                 case List<?> list -> encodeList(list);
                 case Map<?, ?> map -> encodeDic(map);
-                case null, default ->
-                        throw new UnsupportedOperationException("Tipo de dado não suportado para codificação: "  + root.getClass());
+                default ->
+                        throw new UnsupportedOperationException("Tipo de dado não suportado para codificação: " + root.getClass());
             }
 
         }catch (IOException e) {
