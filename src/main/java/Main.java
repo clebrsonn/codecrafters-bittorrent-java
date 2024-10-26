@@ -15,14 +15,25 @@ public class Main {
     String command = args[0];//"info";//args[0];
       Object decoded;
 
-      BencodeDecode bencodeDecode = new BencodeDecode(args[1]);
-      decoded = bencodeDecode.parse();
+      String bencodedValue = args[1];
 
       switch (command) {
-          case "decode" -> System.out.println(gson.toJson(decoded));
+          case "decode" -> {
 
+
+              var inputStream = new ByteArrayInputStream(bencodedValue.getBytes(StandardCharsets.UTF_8));
+
+              decoded = new BencodeDecode(inputStream).parse();
+
+              System.out.println(gson.toJson(decoded));
+          }
           case "info" -> {
+              DigestUtil digestUtil = new DigestUtil();
+              var file = digestUtil.readFile(args[1]);
+              BencodeDecode bencodeDecode = new BencodeDecode(file);
+              decoded = bencodeDecode.parse();
               final var torrent = Torrent.of((TreeMap<String, Object>) decoded);
+
               System.out.println("Tracker URL: " + torrent.announce());
               System.out.println("Length: " + torrent.info().length());
 
@@ -35,8 +46,14 @@ public class Main {
 
           }
           case "peers" -> {
+              DigestUtil digestUtil = new DigestUtil();
+              var file = digestUtil.readFile(bencodedValue);
+              var ben= new Bencode(true);
+              //var ddec= ben.decode(file.readAllBytes(), Type.DICTIONARY);
+              BencodeDecode bencodeDecode = new BencodeDecode(file);
               decoded = bencodeDecode.parse();
               AnnounceResponse returned= new HttpRequests().get(Torrent.of((Map<String, Object>) decoded));
+
               System.out.println(returned.peers());
 
           }
