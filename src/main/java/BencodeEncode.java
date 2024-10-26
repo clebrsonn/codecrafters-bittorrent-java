@@ -57,7 +57,10 @@ public class BencodeEncode {
             final var value = entry.getValue();
 
             encodeString((String) key);
+            System.out.println("key: " + key);
+            System.out.println("key: " + value);
             encode(value);
+
         }
 
         output.write(END_BYTE);
