@@ -15,14 +15,12 @@ public class Main {
     String command = args[0];//"info";//args[0];
       Object decoded;
 
-      String bencodedValue = args[1];
-      BencodeDecode bencodeDecode = new BencodeDecode(bencodedValue);
+      BencodeDecode bencodeDecode = new BencodeDecode(args[1]);
       decoded = bencodeDecode.parse();
 
       switch (command) {
-          case "decode" -> {
-              System.out.println(gson.toJson(decoded));
-          }
+          case "decode" -> System.out.println(gson.toJson(decoded));
+
           case "info" -> {
               final var torrent = Torrent.of((TreeMap<String, Object>) decoded);
               System.out.println("Tracker URL: " + torrent.announce());
