@@ -18,19 +18,21 @@ public class BencodeEncode {
         this.output = output;
     }
 
-    public void encode(Object bencodeDecoded) {
+    public void encode(Object root) {
         try {
-            switch (bencodeDecoded) {
 
-                case String s -> encodeString(s);
-
-                    case Number number -> encodeNumber(number);
-                    case List<?> list -> encodeList(list);
-                    case Map<?, ?> map -> encodeDic(map);
-                    case byte[] bytes -> encodeByteArray(bytes);
-                    case null, default ->
-                            throw new IllegalArgumentException("Tipo de dado não suportado para codificação.");
+            switch (root) {
+                case String string -> encodeString(string);
+                case Long number -> encodeNumber(number);
+                case Integer number -> encodeNumber(Integer.toUnsignedLong(number));
+                case Short number -> encodeNumber(Short.toUnsignedInt(number));
+                case Byte number -> encodeNumber(Byte.toUnsignedInt(number));
+                case List<?> list -> encodeList(list);
+                case Map<?, ?> map -> encodeDic(map);
+                case null, default ->
+                        throw new IllegalArgumentException("Tipo de dado não suportado para codificação.");
             }
+
         }catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -91,8 +91,6 @@ public class HttpRequests {
             try (final var inputStream = responseBody.byteStream()) {
                 final var deserializer = new BencodeDecode(inputStream, true);
                 final var root = deserializer.decode();
-                System.out.println(inputStream.readAllBytes());
-
                 return Torrent.of((Map<String, Object>) root);
             }
         }
