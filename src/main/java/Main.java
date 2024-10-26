@@ -52,9 +52,9 @@ public class Main {
               var ddec= ben.decode(file.readAllBytes(), Type.DICTIONARY);
               //BencodeDecode bencodeDecode = new BencodeDecode(file, false);
               //decoded = bencodeDecode.decode();
-              Map<String, Object> returned= (Map<String, Object>) new HttpRequests().get(ddec);
+              Torrent returned= new HttpRequests().get(ddec);
 
-              System.out.println(((Map<String, Object>)returned.get("info")).get("pieces"));
+              System.out.println(returned.info().pieces());
 
           }
           case null, default -> System.out.println("Unknown command: " + command);
