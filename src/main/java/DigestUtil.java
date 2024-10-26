@@ -9,10 +9,6 @@ import java.util.HexFormat;
 
 public class DigestUtil {
 
-    public FileInputStream readFile(final String fileName) throws IOException {
-        return new FileInputStream(fileName);
-    }
-
     public static byte[] toSha1(final byte[] hash)  {
         if(hash == null){
             return null;

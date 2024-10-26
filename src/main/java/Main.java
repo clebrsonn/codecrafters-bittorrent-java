@@ -3,6 +3,9 @@ import com.dampcake.bencode.Type;
 import com.google.gson.Gson;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -28,11 +31,7 @@ public class Main {
               System.out.println(gson.toJson(decoded));
           }
           case "info" -> {
-              DigestUtil digestUtil = new DigestUtil();
-              var file = digestUtil.readFile(args[1]);
-              BencodeDecode bencodeDecode = new BencodeDecode(file);
-              decoded = bencodeDecode.parse();
-              final var torrent = Torrent.of((TreeMap<String, Object>) decoded);
+              final var torrent = load(bencodedValue);
 
               System.out.println("Tracker URL: " + torrent.announce());
               System.out.println("Length: " + torrent.info().length());
@@ -46,13 +45,8 @@ public class Main {
 
           }
           case "peers" -> {
-              DigestUtil digestUtil = new DigestUtil();
-              var file = digestUtil.readFile(bencodedValue);
-              var ben= new Bencode(true);
-              //var ddec= ben.decode(file.readAllBytes(), Type.DICTIONARY);
-              BencodeDecode bencodeDecode = new BencodeDecode(file);
-              decoded = bencodeDecode.parse();
-              AnnounceResponse returned= new HttpRequests().get(Torrent.of((Map<String, Object>) decoded));
+              final var torrent = load(bencodedValue);
+              AnnounceResponse returned= new HttpRequests().get(torrent);
 
               System.out.println(returned.peers());
 
@@ -60,5 +54,12 @@ public class Main {
           case null, default -> System.out.println("Unknown command: " + command);
       }
 
+  }
+
+  private static Torrent load(final String path) throws IOException {
+      var file = new FileInputStream(path);
+          final var decoded = new BencodeDecode(file).parse();
+
+          return Torrent.of((Map<String, Object>) decoded);
   }
 }
