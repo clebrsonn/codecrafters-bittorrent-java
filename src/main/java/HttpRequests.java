@@ -82,12 +82,11 @@ public class HttpRequests {
 
         try (
                 final var response = client.newCall(request).execute();
-                final var responseBody = response.body();
+                final var responseBody = response.body()
         ) {
             if (!response.isSuccessful()) {
                 throw new IllegalStateException(responseBody.string());
             }
-            System.out.println(new String(responseBody.bytes()));
             try (final var inputStream = responseBody.byteStream()) {
                 final var deserializer = new BencodeDecode(inputStream, true);
                 final var root = (Map<String, Object>) deserializer.decode();
