@@ -52,7 +52,7 @@ public class Main {
               var ddec= ben.decode(file.readAllBytes(), Type.DICTIONARY);
               //BencodeDecode bencodeDecode = new BencodeDecode(file, false);
               //decoded = bencodeDecode.decode();
-
+              System.out.println(ddec.toString());
               System.out.println(new HttpRequests().get(ddec));
 
           }
