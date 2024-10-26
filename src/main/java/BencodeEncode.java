@@ -8,6 +8,12 @@ import java.util.TreeMap;
 public class BencodeEncode {
     private final OutputStream output;
 
+    public static final byte INTEGER_BYTE = 'i';
+    public static final byte COLON_BYTE = ':';
+    public static final byte END_BYTE = 'e';
+    public static final byte LIST_BYTE = 'l';
+    public static final byte MAP_BYTE = 'd';
+
     public BencodeEncode(OutputStream output) {
         this.output = output;
     }
@@ -31,40 +37,46 @@ public class BencodeEncode {
     }
 
     private void encodeList(List<?> toEncode) throws IOException {
-        output.write('l');
-        for (Object item : toEncode) {
-            encode(item);
+        output.write(LIST_BYTE);
+
+        for (final var element : toEncode) {
+            encode(element);
         }
-        output.write('e');
+
+        output.write(END_BYTE);
     }
 
     void encodeDic(Map<?, ?> toEncode) throws IOException {
         // Ordena o dicionário
-        Map<String, Object> sortedDict = new TreeMap<>();
-        for (Map.Entry<?, ?> entry : toEncode.entrySet()) {
-            sortedDict.put(entry.getKey().toString(), entry.getValue());
+        output.write(MAP_BYTE);
+
+        for (final var entry : toEncode.entrySet()) {
+            final var key = entry.getKey();
+            final var value = entry.getValue();
+
+            encodeString((String) key);
+            encode(value);
         }
 
-        output.write('d');
-        for (Map.Entry<String, Object> entry : sortedDict.entrySet()) {
-            encodeString(entry.getKey());
-            encode(entry.getValue());
-        }
-        output.write('e');
+        output.write(END_BYTE);
     }
 
     void encodeString(String bencodeDecoded) throws IOException {
-        byte[] bytes = bencodeDecoded.getBytes(StandardCharsets.ISO_8859_1);
-        output.write((bytes.length + ":").getBytes(StandardCharsets.ISO_8859_1));
-        output.write(bytes);
+        output.write(String.valueOf(bencodeDecoded.length()).getBytes());
+        output.write(COLON_BYTE);
+        output.write(bencodeDecoded.getBytes(StandardCharsets.ISO_8859_1));
     }
 
     private void encodeByteArray(byte[] bytes) throws IOException {
-        output.write((bytes.length + ":").getBytes(StandardCharsets.ISO_8859_1));
+        output.write(bytes.length);
+        output.write(COLON_BYTE);
+
         output.write(bytes);
     }
 
     void encodeNumber(Number bencodeDecoded) throws IOException {
-        output.write(("i" + bencodeDecoded + "e").getBytes(StandardCharsets.ISO_8859_1));
+        output.write(INTEGER_BYTE);
+        output.write(String.valueOf(bencodeDecoded).getBytes());
+        output.write(END_BYTE);
     }
 }

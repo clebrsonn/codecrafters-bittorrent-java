@@ -20,14 +20,10 @@ public class Main {
         String bencodedValue = args[1];
 
 
-        try {
-            var inputStream= new ByteArrayInputStream(bencodedValue.getBytes(StandardCharsets.UTF_8));
+        var inputStream= new ByteArrayInputStream(bencodedValue.getBytes(StandardCharsets.UTF_8));
 
-            decoded = new BencodeDecode(inputStream, false).decode();
-        } catch(RuntimeException e) {
-          System.out.println(e.getMessage());
-          return;
-        }
+        decoded = new BencodeDecode(inputStream, false).decode();
+
         System.out.println(gson.toJson(decoded));
 
     }else if("info".equals(command)) {
@@ -35,24 +31,19 @@ public class Main {
         var file= digestUtil.readFile(args[1]);//"./sample.torrent");//args[1]);
           BencodeDecode bencodeDecode=new BencodeDecode(file, true);
         decoded = bencodeDecode.decode();
+        final var torrent = Torrent.of((TreeMap<String, Object>) decoded);
 
-        System.out.println("Tracker URL: " + new String((byte[]) ((TreeMap<String, Object>) decoded).get("announce"), StandardCharsets.UTF_8));
-        System.out.println("Length: " + ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("length"));
+        System.out.println("Tracker URL: " + torrent.announce());
+        System.out.println("Length: " + torrent.info().length());
         //Bencode bencode = new Bencode(true);
 
-          var outputStream = new ByteArrayOutputStream();
-          new BencodeEncode(outputStream).encodeDic(new TreeMap<>((TreeMap<String, Object>) ((TreeMap<String, Object>) decoded).get("info")));
-
-          System.out.println("Info Hash: " + DigestUtil.hexToSha1(
-                  outputStream.toByteArray())
-          );
-          System.out.println("Piece Length: " + ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("piece length"));
-          List<byte[]> pieceHashes =bencodeDecode.decodePieces((byte[]) ((TreeMap<String, Object>)((TreeMap<String, Object>) decoded).get("info")).get("pieces"));
+          System.out.println("Info Hash: " + new String(torrent.info().hash(), StandardCharsets.ISO_8859_1));
+          System.out.println("Piece Length: " + torrent.info().pieceLength());
           //pieceHashes.forEach(piece -> System.out.println(DigestUtil.hexToSha1(piece)));
 
           System.out.println("Piece Hashes:" );
 
-          pieceHashes.forEach(piece -> System.out.println(DigestUtil.bytesToHex(piece)));
+          torrent.info().pieces().forEach(piece -> System.out.println(DigestUtil.bytesToHex(piece)));
 
     }else if("peers".equals(command)){
           DigestUtil digestUtil = new DigestUtil();

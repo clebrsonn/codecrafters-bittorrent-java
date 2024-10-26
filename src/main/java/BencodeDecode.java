@@ -15,11 +15,11 @@ public class BencodeDecode {
         int prefix = this.input.read();
         if (Character.isDigit(prefix)) {
             return useBytes ? decodeStringByte(prefix) : decodeString(prefix);
-        } else if (prefix == 'i') {
+        } else if (prefix == BencodeEncode.INTEGER_BYTE) {
             return decodeNumber();
-        } else if (prefix == 'l') {
+        } else if (prefix == BencodeEncode.LIST_BYTE) {
             return decodeList();
-        } else if (prefix == 'd') {
+        } else if (prefix == BencodeEncode.MAP_BYTE) {
             return decodeMap();
         }else {
             throw new RuntimeException("Only strings are supported at the moment");
@@ -30,7 +30,7 @@ public class BencodeDecode {
         List<Object> list = new ArrayList<>();
         while (true) {
             int next = this.input.read();
-            if (next == 'e') {
+            if (next == BencodeEncode.END_BYTE) {
                 break; // Fim da lista
             } else {
                 this.input.unread(next); // Reverte o byte lido
@@ -45,7 +45,7 @@ public class BencodeDecode {
 
         while (true) {
             int next = this.input.read();
-            if (next == 'e') {
+            if (next == BencodeEncode.END_BYTE) {
                 break; // Fim do dicionário
             } else {
                 this.input.unread(next);
@@ -62,7 +62,7 @@ public class BencodeDecode {
     private Long decodeNumber() throws IOException {
         StringBuilder number = new StringBuilder();
         int b;
-        while ((b = this.input.read()) != 'e') {
+        while ((b = this.input.read()) != BencodeEncode.END_BYTE) {
             number.append((char) b);
         }
         return Long.parseLong(number.toString());
@@ -72,7 +72,7 @@ public class BencodeDecode {
         StringBuilder lengthStr = new StringBuilder();
         lengthStr.append((char) firstDigit);
         int b;
-        while ((b = this.input.read()) != ':') {
+        while ((b = this.input.read()) != BencodeEncode.COLON_BYTE) {
             lengthStr.append((char) b);
         }
         int length = Integer.parseInt(lengthStr.toString());
@@ -87,20 +87,4 @@ public class BencodeDecode {
         return new String(decodeStringByte(firstDigit), Charset.defaultCharset());
     }
 
-    public static List<byte[]> decodePieces(byte[] piecesBytes) {
-        final int SHA1_LENGTH = 20;
-        List<byte[]> pieces = new ArrayList<>();
-
-        if (piecesBytes.length % SHA1_LENGTH != 0) {
-            throw new IllegalArgumentException("Tamanho do campo `pieces` não é múltiplo de 20 bytes.");
-        }
-
-        for (int i = 0; i < piecesBytes.length; i += SHA1_LENGTH) {
-            byte[] pieceHash = new byte[SHA1_LENGTH];
-            System.arraycopy(piecesBytes, i, pieceHash, 0, SHA1_LENGTH);
-            pieces.add(pieceHash);
-        }
-
-        return pieces;
-    }
 }
