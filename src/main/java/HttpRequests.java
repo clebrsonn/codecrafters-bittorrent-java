@@ -59,7 +59,7 @@ public class HttpRequests {
             request = new Request.Builder()
                     .get()
                     .url(
-                            HttpUrl.parse(torrent.get("announce").toString())
+                            HttpUrl.parse(String.valueOf(torrent.get("announce")))
                                     .newBuilder()
                                     .addEncodedQueryParameter("info_hash", URLEncoder.encode(new String(DigestUtil.shaInfo(info), StandardCharsets.ISO_8859_1), StandardCharsets.ISO_8859_1.name()))
                                     .addQueryParameter("peer_id", "cbc12233445566778899")
