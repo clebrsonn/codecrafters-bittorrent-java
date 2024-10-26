@@ -13,7 +13,7 @@ public class BencodeDecode {
 
     public Object decode() throws IOException {
         int prefix = this.input.read();
-        System.out.println("prefix: " + prefix);
+        System.out.println("prefix: " + new String(String.valueOf(prefix)));
         if (Character.isDigit(prefix)) {
             return useBytes ? decodeStringByte(prefix) : decodeString(prefix);
         } else if (prefix == BencodeEncode.INTEGER_BYTE) {
