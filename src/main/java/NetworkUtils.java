@@ -2,6 +2,7 @@ import lombok.SneakyThrows;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +18,6 @@ public class NetworkUtils {
         return parseSocketAddresses(128 / 8, input);
     }
 
-    @SneakyThrows
     private static List<InetSocketAddress> parseSocketAddresses(int length, String input) {
         if (input == null) {
             return Collections.emptyList();
@@ -30,8 +30,13 @@ public class NetworkUtils {
             final var address = Arrays.copyOfRange(bytes, start, start + length);
             final var port = ((bytes[start + length] & 0xff) << 8) + (bytes[start + length + 1] & 0xff);
 
-            final var peer = new InetSocketAddress(InetAddress.getByAddress(address), port);
-            addresses.add(peer);
+            final InetSocketAddress peer;
+            try {
+                peer = new InetSocketAddress(InetAddress.getByAddress(address), port);
+                addresses.add(peer);
+            } catch (UnknownHostException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         return addresses;
