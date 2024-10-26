@@ -13,7 +13,7 @@ public record TorrentInfo(byte[] hash,
 
         final var hash = DigestUtil.shaInfo(root);
         final var length = (long) root.getOrDefault("length", -1L);
-        final var name = (String) root.get("name");
+        final var name = new String((byte[]) root.get("name"), StandardCharsets.ISO_8859_1);
         final var pieceLength = (int) (long) root.get("piece length");
 
         final var pieceHashes = ((String) root.get("pieces")).getBytes(StandardCharsets.ISO_8859_1);
