@@ -6,6 +6,7 @@ import okhttp3.Response;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -59,7 +60,9 @@ public class HttpRequests {
             request = new Request.Builder()
                     .get()
                     .url(
-                            HttpUrl.parse(String.valueOf(torrent.get("announce")))
+                            HttpUrl.parse(new String(
+                                    ((ByteBuffer)(torrent.get("announce"))).array()
+                                    ))
                                     .newBuilder()
                                     .addEncodedQueryParameter("info_hash", URLEncoder.encode(new String(DigestUtil.shaInfo(info), StandardCharsets.ISO_8859_1), StandardCharsets.ISO_8859_1.name()))
                                     .addQueryParameter("peer_id", "cbc12233445566778899")
