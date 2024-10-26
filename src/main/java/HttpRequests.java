@@ -25,7 +25,7 @@ public class HttpRequests {
                             HttpUrl.parse(torrent.announce())
                                     .newBuilder()
                                     .addEncodedQueryParameter("info_hash", URLEncoder.encode(new String(torrent.info().hash(), StandardCharsets.ISO_8859_1), StandardCharsets.ISO_8859_1.name()))
-                                    .addQueryParameter("peer_id", "cbc12233445566778899")
+                                    .addQueryParameter("peer_id", "00112233445566778899")
                                     .addQueryParameter("port", String.valueOf(6881))
                                     .addQueryParameter("uploaded", "0")
                                     .addQueryParameter("downloaded", "0")
