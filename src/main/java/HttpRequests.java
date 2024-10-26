@@ -89,7 +89,7 @@ public class HttpRequests {
             }
 
             try (final var inputStream = responseBody.byteStream()) {
-                final var deserializer = new BencodeDecode(inputStream, false);
+                final var deserializer = new BencodeDecode(inputStream, true);
                 final var root = (Map<String, Object>) deserializer.decode();
 
                 return AnnounceResponse.of(root);

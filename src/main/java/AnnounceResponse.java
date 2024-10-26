@@ -14,8 +14,8 @@ public record AnnounceResponse(long interval,
         }
 
         final var peers = new ArrayList<InetSocketAddress>();
-        peers.addAll(NetworkUtils.parseV4SocketAddresses((String) root.get("peers")));
-        peers.addAll(NetworkUtils.parseV6SocketAddresses((String) root.get("peers6")));
+        peers.addAll(NetworkUtils.parseV4SocketAddresses((byte[]) root.get("peers")));
+        peers.addAll(NetworkUtils.parseV6SocketAddresses((byte[]) root.get("peers6")));
 
         // peers.removeIf((x) -> x.getPort() == selfPort);
         // peers.removeIf((x) -> x.getAddress() instanceof Inet4Address);
