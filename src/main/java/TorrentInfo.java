@@ -10,13 +10,12 @@ public record TorrentInfo(byte[] hash,
                           int pieceLength,
                           List<byte[]> pieces) {
     public static TorrentInfo of(Map<String, Object> root) {
-
         final var hash = DigestUtil.shaInfo(root);
-        final var length = (long) root.getOrDefault("length", -1L);
-        final var name = new String((byte[]) root.get("name"), StandardCharsets.ISO_8859_1);
+        final var length = (long) root.getOrDefault("length", -1l);
+        final var name = (String) root.get("name");
         final var pieceLength = (int) (long) root.get("piece length");
 
-        final var pieceHashes = ((byte[]) root.get("pieces"));
+        final var pieceHashes = ((String) root.get("pieces")).getBytes(StandardCharsets.ISO_8859_1);
         final var pieces = new ArrayList<byte[]>();
         for (var start = 0; start < pieceHashes.length; start += 20) {
             final var piece = Arrays.copyOfRange(pieceHashes, start, start + 20);
