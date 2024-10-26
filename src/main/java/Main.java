@@ -52,9 +52,8 @@ public class Main {
               var ddec= ben.decode(file.readAllBytes(), Type.DICTIONARY);
               //BencodeDecode bencodeDecode = new BencodeDecode(file, false);
               //decoded = bencodeDecode.decode();
-              final var torrent = Torrent.of(ddec);
 
-              System.out.println(new HttpRequests().get(torrent));
+              System.out.println(new HttpRequests().get(ddec));
 
           }
           case null, default -> System.out.println("Unknown command: " + command);
