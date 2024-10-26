@@ -17,8 +17,6 @@ public class DigestUtil {
         if(hash == null){
             return null;
         }
-
-
         try {
             MessageDigest digest2 = MessageDigest.getInstance("SHA-1");
             return digest2.digest(hash);
