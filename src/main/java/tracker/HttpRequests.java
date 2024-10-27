@@ -15,20 +15,20 @@ import java.util.Map;
 public class HttpRequests {
     public final OkHttpClient client = new OkHttpClient();
 
-    public AnnounceResponse get(Torrent torrent) throws IOException{
+    public AnnounceResponse get(Announceable torrent) throws IOException{
         final Request request;
         try {
             request = new Request.Builder()
                     .get()
                     .url(
-                            HttpUrl.parse(torrent.announce())
+                            HttpUrl.parse(torrent.getTrackerURL())
                                     .newBuilder()
-                                    .addEncodedQueryParameter("info_hash", URLEncoder.encode(new String(torrent.info().hash(), StandardCharsets.ISO_8859_1), StandardCharsets.ISO_8859_1.name()))
+                                    .addEncodedQueryParameter("info_hash", URLEncoder.encode(new String(torrent.getInfoHash(), StandardCharsets.ISO_8859_1), StandardCharsets.ISO_8859_1.name()))
                                     .addQueryParameter("peer_id", "cbc12233445566778899")
                                     .addQueryParameter("port", String.valueOf(6881))
                                     .addQueryParameter("uploaded", "0")
                                     .addQueryParameter("downloaded", "0")
-                                    .addQueryParameter("left", String.valueOf(torrent.info().length()))
+                                    .addQueryParameter("left", String.valueOf(torrent.getInfoLength()))
                                     .addQueryParameter("compact", "1")
                                     .build()
                     )

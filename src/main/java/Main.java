@@ -67,8 +67,8 @@ public class Main {
               int pieceIndex = Integer.parseInt(args[4]);
 
               try (
-                      final var peer = Peer.connect(returned.peers().getFirst(), torrent);
-                      final var fileOutputStream = new FileOutputStream(new File(outputPath));
+                  final var peer = Peer.connect(returned.peers().getFirst(), torrent);
+                  final var fileOutputStream = new FileOutputStream(new File(outputPath));
               ) {
                   final var data = peer.downloadPiece(torrent.info(), pieceIndex);
                   fileOutputStream.write(data);
@@ -98,6 +98,13 @@ public class Main {
               System.out.printf("Tracker URL: %s%n", (magnet.getTrackerURL()));
               System.out.printf("Info Hash: %s%n", DigestUtil.bytesToHex(magnet.getInfoHash()));
 
+          }case "magnet_handshake" ->{
+              var magnetLink= args[1];
+              var magnet= Magnet.of(magnetLink);
+              AnnounceResponse returned= new HttpRequests().get(magnet);
+              try (final var peer = Peer.connect(returned.peers().getFirst(), magnet)) {
+                  System.out.printf("Peer ID: %s%n", DigestUtil.bytesToHex(peer.getId()));
+              }
           }
           case null, default -> System.out.println("Unknown command: " + command);
       }
