@@ -23,7 +23,7 @@ public record Magnet(byte[] hash,String name, String url) implements Announceabl
 
     @Override
     public Long getInfoLength() {
-        return 0L;
+        return 1L;
     }
 
     public static Magnet of(String link){
