@@ -95,7 +95,7 @@ public class Main {
           case "magnet_parse" ->{
               var magnetLink= args[1];
               var magnet= Magnet.of(magnetLink);
-              System.out.printf("Tracker URL: %s%n", (magnet.getTrackerURL()));
+              System.out.printf("Tracker URL: %s%n", new String(magnet.getTrackerURL()));
               System.out.printf("Peer ID: %s%n", (magnet.getInfoHash()));
 
           }

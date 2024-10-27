@@ -5,8 +5,9 @@ import utils.DigestUtil;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.HexFormat;
 
-public record Magnet(byte[] hash, String url, String name) implements Announceable {
+public record Magnet(byte[] hash,String name, String url) implements Announceable {
     private static String SCHEMA= "magnet:";
     private static String SCHEMA_HASH= "urn:btih:";
 
@@ -45,6 +46,6 @@ public record Magnet(byte[] hash, String url, String name) implements Announceab
         });
 
         //magnet:?xt=urn:btih:ad42ce8109f54c99613ce38f9b4d87e70f24a165&dn=magnet1.gif&tr=http%3A%2F%2Fbittorrent-test-tracker.codecrafters.io%2Fannounce
-        return new Magnet(DigestUtil.bytesToHex(exactTopic[0].getBytes()).getBytes(), displayName[0], addressTracker[0]);
+        return new Magnet(HexFormat.of().parseHex(exactTopic[0]), displayName[0], addressTracker[0]);
     }
 }
