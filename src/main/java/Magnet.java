@@ -13,12 +13,12 @@ public record Magnet(byte[] hash,String name, String url) implements Announceabl
 
     @Override
     public String getTrackerURL() {
-        return url;
+        return name();
     }
 
     @Override
     public byte[] getInfoHash() {
-        return hash;
+        return hash();
     }
 
     @Override
