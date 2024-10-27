@@ -57,6 +57,18 @@ public class Main {
               final var address= args[2].split(":");
               System.out.println("Peer ID: " + DigestUtil.bytesToHex(new SocketClient().connect(new Socket(address[0], Integer.parseInt(address[1])), torrent)));
           }
+          case "download_piece"->{
+              final var torrent = load(args[3]);
+              AnnounceResponse returned= new HttpRequests().get(torrent);
+
+              returned.peers().forEach(p -> {
+                  try {
+                      new SocketClient().connect(new Socket(p.getAddress(), p.getPort()),torrent);
+                  } catch (IOException e) {
+                      throw new RuntimeException(e);
+                  }
+              });
+          }
           case null, default -> System.out.println("Unknown command: " + command);
       }
 
