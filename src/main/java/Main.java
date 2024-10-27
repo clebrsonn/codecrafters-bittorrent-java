@@ -55,7 +55,7 @@ public class Main {
           case "handshake" -> {
               final var torrent = load(bencodedValue);
               final var address= args[2].split(":");
-              System.out.println("Peer ID: " + DigestUtil.hexToSha1(new SocketClient().connect(new Socket(address[0], Integer.parseInt(address[1])), torrent)));
+              System.out.println("Peer ID: " + DigestUtil.bytesToHex(new SocketClient().connect(new Socket(address[0], Integer.parseInt(address[1])), torrent)));
           }
           case null, default -> System.out.println("Unknown command: " + command);
       }
