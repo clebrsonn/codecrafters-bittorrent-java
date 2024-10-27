@@ -16,12 +16,9 @@ public class BittorrentDownloader {
     private static final int MAX_PIPELINE = 5; // Máximo de 5 blocos pendentes
 
     public static void downloadPiece(InetSocketAddress address, int pieceIndex, String outputPath, TorrentInfo info) throws Exception {
-        // Inicializar e ler o arquivo torrent (substitua com a lógica de leitura do arquivo)
-        byte[] infoHash = info.hash();
-        Long pieceLength = info.length();
 
         // Conectar-se a um peer
-        Peer peer = new Peer(new Socket(address.getAddress(), address.getPort()), infoHash); // Exemplo fictício para estabelecer conexão
+        Peer peer = new Peer(new Socket(address.getAddress(), address.getPort()), info.hash()); // Exemplo fictício para estabelecer conexão
 
         // Fazer handshake
         peer.performHandshake();
@@ -33,14 +30,14 @@ public class BittorrentDownloader {
         // Dividir a peça em blocos e fazer download com pipelining
         List<byte[]> pieceBlocks = new ArrayList<>();
         Queue<Long> pendingOffsets = new LinkedList<>();
-        for (Long offset = 0L; offset < pieceLength; offset += BLOCK_SIZE) {
+        for (Long offset = 0L; offset < info.length(); offset += BLOCK_SIZE) {
             pendingOffsets.add(offset);
         }
 
         while (!pendingOffsets.isEmpty() || !pieceBlocks.isEmpty()) {
             while (pendingOffsets.size() > 0 && pieceBlocks.size() < MAX_PIPELINE) {
                 Long offset = pendingOffsets.poll();
-                Long blockLength = Math.min(BLOCK_SIZE, pieceLength - offset);
+                Long blockLength = Math.min(BLOCK_SIZE, info.length() - offset);
                 peer.sendRequest(pieceIndex, offset, blockLength);
                 pieceBlocks.add(new byte[Math.toIntExact(blockLength)]); // Placeholder para o bloco recebido
             }
@@ -53,7 +50,7 @@ public class BittorrentDownloader {
         }
 
         // Combinar blocos em uma peça completa
-        byte[] completePiece = new byte[Math.toIntExact(pieceLength)];
+        byte[] completePiece = new byte[Math.toIntExact(info.length())];
         for (int i = 0; i < pieceBlocks.size(); i++) {
             System.arraycopy(pieceBlocks.get(i), 0, completePiece, i * BLOCK_SIZE, pieceBlocks.get(i).length);
         }
