@@ -1,3 +1,4 @@
+package bencode;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;

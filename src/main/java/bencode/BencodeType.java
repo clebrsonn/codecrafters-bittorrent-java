@@ -1,3 +1,5 @@
+package bencode;
+
 public enum BencodeType {
     DICTIONARY,
     STRING,

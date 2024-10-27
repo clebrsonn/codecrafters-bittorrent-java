@@ -1,7 +1,8 @@
-import lombok.SneakyThrows;
+package utils;
+
+import bencode.BencodeEncode;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

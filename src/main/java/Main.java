@@ -1,10 +1,12 @@
-import com.dampcake.bencode.Bencode;
-import com.dampcake.bencode.Type;
+import bencode.BencodeDecode;
 import com.google.gson.Gson;
+import torrent.Torrent;
+import tracker.AnnounceResponse;
+import tracker.HttpRequests;
+import utils.DigestUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -55,7 +57,7 @@ public class Main {
           case "handshake" -> {
               final var torrent = load(bencodedValue);
               final var address= args[2].split(":");
-              System.out.println("Peer ID: " + DigestUtil.bytesToHex(new SocketClient().connect(new Socket(address[0], Integer.parseInt(address[1])), torrent)));
+              System.out.println("Peer ID: " + DigestUtil.bytesToHex(new Peer(new Socket(address[0], Integer.parseInt(address[1])), torrent.getInfoHash()).performHandshake()));
           }
           case "download_piece"->{
               final var torrent = load(args[3]);
@@ -63,12 +65,12 @@ public class Main {
 
               returned.peers().forEach(p -> {
                   try {
-                      new SocketClient().connect(new Socket(p.getAddress(), p.getPort()),torrent);
+                      //new Peer(new Socket(p.getAddress(), p.getPort()), torrent.getInfoHash()).performHandshake();
                       int pieceIndex = Integer.parseInt(args[4]);
                       String outputPath = args[2]; // Ex: /tmp/test-piece-0
-                      BittorrentDownloader.downloadPiece(p, pieceIndex, outputPath);
+                      BittorrentDownloader.downloadPiece(p, pieceIndex, outputPath, torrent.info());
 
-                  } catch (IOException e) {
+                  } catch (Exception e) {
                       throw new RuntimeException(e);
                   }
               });
