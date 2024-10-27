@@ -17,8 +17,6 @@ public class Peer {
     private final byte[] infoHash;
     private byte[] peerId;
 
-    private Announceable announce;
-
     public Peer(Socket socket, byte[] infoHash) throws IOException {
         this.socket = socket;
         this.in = socket.getInputStream();
@@ -43,7 +41,7 @@ public class Peer {
             payloadBuffer.put((byte) 19)
                     .put(PROTOCOL_BYTES)
                     .put(PADDING_8)
-                    .put(announce.getInfoHash())
+                    .put(infoHash)
                     .put("cbc12233445566778899".getBytes());
             out.write(payloadBuffer.array());
             final byte[] handshakeResponse = new byte[handshakeMessageSize];
