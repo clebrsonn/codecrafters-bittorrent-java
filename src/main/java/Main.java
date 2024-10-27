@@ -64,6 +64,10 @@ public class Main {
               returned.peers().forEach(p -> {
                   try {
                       new SocketClient().connect(new Socket(p.getAddress(), p.getPort()),torrent);
+                      int pieceIndex = Integer.parseInt(args[4]);
+                      String outputPath = args[2]; // Ex: /tmp/test-piece-0
+                      BittorrentDownloader.downloadPiece(p, pieceIndex, outputPath);
+
                   } catch (IOException e) {
                       throw new RuntimeException(e);
                   }
