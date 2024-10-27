@@ -1,7 +1,4 @@
-import torrent.Torrent;
 import torrent.TorrentInfo;
-import tracker.AnnounceResponse;
-import tracker.Announceable;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -23,6 +20,7 @@ public class BittorrentDownloader {
 
         // Fazer handshake
         peer.performHandshake();
+        peer.waitForBitfield();
 
         // Trocar mensagens iniciais
         peer.sendInterested();
@@ -45,9 +43,9 @@ public class BittorrentDownloader {
 
             // Receber e processar o próximo bloco
             Peer.Block block = peer.receivePiece();
-            int blockOffset = block.getOffset();
+            int blockOffset = block.offset();
             int index = blockOffset / BLOCK_SIZE;
-            pieceBlocks.set(index, block.getData()); // Armazena o bloco recebido
+            pieceBlocks.set(index, block.data()); // Armazena o bloco recebido
         }
 
         // Combinar blocos em uma peça completa

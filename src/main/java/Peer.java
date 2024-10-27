@@ -1,4 +1,4 @@
-import tracker.Announceable;
+import lombok.Getter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,16 +6,16 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
-public class Peer {
+public class Peer implements AutoCloseable{
     private static final byte[] PROTOCOL_BYTES= "BitTorrent protocol".getBytes(StandardCharsets.ISO_8859_1);
     private static final byte[] PADDING_8= new byte[8];
 
     private final Socket socket;
-    private InputStream in;
-    private OutputStream out;
+    private final InputStream in;
+    private final OutputStream out;
     private final byte[] infoHash;
-    private byte[] peerId;
 
     public Peer(Socket socket, byte[] infoHash) throws IOException {
         this.socket = socket;
@@ -30,27 +30,32 @@ public class Peer {
     }
 
     public byte[] performHandshake() throws IOException {
-        var in = socket.getInputStream();
-        var out = socket.getOutputStream();
-        final int handshakeMessageSize = 1 + PROTOCOL_BYTES.length + PADDING_8.length + 20 + 20;
-        final ByteBuffer payloadBuffer =
-                ByteBuffer.allocate(handshakeMessageSize);
-        payloadBuffer.put((byte) 19)
-                .put(PROTOCOL_BYTES)
-                .put(PADDING_8)
-                .put(infoHash)
-                .put("cbc12233445566778899".getBytes());
-        out.write(payloadBuffer.array());
-        final byte[] handshakeResponse = new byte[handshakeMessageSize];
-        in.read(handshakeResponse);
-        final byte[] peerIdResponse = new byte[20];
-        final ByteBuffer wrap = ByteBuffer.wrap(handshakeResponse);
-        wrap.position(48);
-        wrap.get(peerIdResponse, 0, 20);
+        try {
+            var in = socket.getInputStream();
+            var out = socket.getOutputStream();
+            final int handshakeMessageSize = 1 + PROTOCOL_BYTES.length + PADDING_8.length + 20 + 20;
+            final ByteBuffer payloadBuffer =
+                    ByteBuffer.allocate(handshakeMessageSize);
+            payloadBuffer.put((byte) 19)
+                    .put(PROTOCOL_BYTES)
+                    .put(PADDING_8)
+                    .put(infoHash)
+                    .put("cbc12233445566778899".getBytes());
+            out.write(payloadBuffer.array());
+            final byte[] handshakeResponse = new byte[handshakeMessageSize];
+            in.read(handshakeResponse);
+            final byte[] peerIdResponse = new byte[20];
+            final ByteBuffer wrap = ByteBuffer.wrap(handshakeResponse);
+            wrap.position(48);
+            wrap.get(peerIdResponse, 0, 20);
 
-        // Envia a mensagem de handshake
-        this.peerId= peerIdResponse;
-        return peerIdResponse;
+            // Envia a mensagem de handshake
+            return peerIdResponse;
+        }catch (IOException e){
+            this.close();
+            throw e;
+
+        }
     }
 
     public void sendInterested() throws IOException {
@@ -74,6 +79,29 @@ public class Peer {
             throw new IOException("Esperado mensagem unchoke (id 1), mas recebeu outro tipo.");
         }
     }
+
+    public void waitForBitfield() throws IOException {
+        byte[] lengthPrefix = new byte[4];
+        in.read(lengthPrefix);
+
+        int length = ByteBuffer.wrap(lengthPrefix).getInt();
+        if (length == 0) {
+            System.out.println("Nenhuma mensagem de bitfield recebida.");
+            return;
+        }
+
+        byte messageId = (byte) in.read();
+        if (messageId != 5) {
+            System.out.println("Mensagem inesperada recebida, ID: " + messageId);
+            return;
+        }
+
+        byte[] bitfield = new byte[length - 1];
+        //in.read(bitfield);
+
+        System.out.println("Mensagem bitfield recebida: " + Arrays.toString(bitfield));
+    }
+
 
     public void sendRequest(int index, Long offset, Long length) throws IOException {
         ByteBuffer request = ByteBuffer.allocate(17);
@@ -114,28 +142,7 @@ public class Peer {
         socket.close();
     }
 
-    public static class Block {
-        private final int index;
-        private final int offset;
-        private final byte[] data;
-
-        public Block(int index, int offset, byte[] data) {
-            this.index = index;
-            this.offset = offset;
-            this.data = data;
-        }
-
-        public int getIndex() {
-            return index;
-        }
-
-        public int getOffset() {
-            return offset;
-        }
-
-        public byte[] getData() {
-            return data;
-        }
+    public record Block(int index, int offset, byte[] data) {
     }
 
 }
