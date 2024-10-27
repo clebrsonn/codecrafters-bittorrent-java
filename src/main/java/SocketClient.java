@@ -16,7 +16,6 @@ public class SocketClient {
             byte[] peerId = new byte[20];
             new SecureRandom().nextBytes(peerId);
 
-            System.out.println("Connected to server.");
             // Open input and output streams
             final var infoHash = torrent.info().hash();
             // Exchange data
