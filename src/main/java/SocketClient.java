@@ -22,7 +22,7 @@ public class SocketClient {
                     .put(PROTOCOL_BYTES)
                     .put(PADDING_8)
                     .put(torrent.info().hash())
-                    .put("00112233445566778899".getBytes());
+                    .put("cbc12233445566778899".getBytes());
             out.write(payloadBuffer.array());
             final byte[] handshakeResponse = new byte[handshakeMessageSize];
             in.read(handshakeResponse);
