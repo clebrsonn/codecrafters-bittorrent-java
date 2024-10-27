@@ -254,7 +254,7 @@ public class Peer implements AutoCloseable {
 
     public static Peer connect(Socket socket, Announceable announceable) throws IOException {
         final var infoHash = announceable.getInfoHash();
-        final var padding = PADDING_8;
+        final var padding = announceable instanceof Magnet ? PADDING_MAGNET_8 : PADDING_8;
 
         try {
             final var inputStream = new DataInputStream(socket.getInputStream());

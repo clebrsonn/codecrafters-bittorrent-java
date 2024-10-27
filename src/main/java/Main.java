@@ -103,6 +103,7 @@ public class Main {
               var magnet= Magnet.of(magnetLink);
               AnnounceResponse returned= new HttpRequests().get(magnet);
               try (final var peer = Peer.connect(returned.peers().getFirst(), magnet)) {
+                  peer.awaitBitfield();
                   System.out.printf("Peer ID: %s%n", DigestUtil.bytesToHex(peer.getId()));
               }
           }
