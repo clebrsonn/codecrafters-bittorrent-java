@@ -30,12 +30,16 @@ public class Peer implements AutoCloseable {
 
     private boolean bitfield;
     private boolean interested;
-    private @Getter int metadataExtensionId = -1;
+    private int metadataExtensionId = -1;
 
     private List<Message> receiveQueue;
 
     public byte[] getId(){
         return this.id;
+    }
+
+    public int getMetadataExtensionId(){
+        return metadataExtensionId;
     }
 
     public Peer(byte[] id, Socket socket, boolean supportExtensions) {
