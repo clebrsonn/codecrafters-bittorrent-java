@@ -4,6 +4,7 @@ import tracker.AnnounceResponse;
 import tracker.Announceable;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ public class BittorrentDownloader {
     private static final int BLOCK_SIZE = 16 * 1024; // 16 KB
     private static final int MAX_PIPELINE = 5; // Máximo de 5 blocos pendentes
 
-    public static void downloadPiece(InetSocketAddress address, int pieceIndex, String outputPath, TorrentInfo info) throws Exception {
+    public static void downloadPiece(InetSocketAddress address, int pieceIndex, String outputPath, TorrentInfo info) throws IOException {
 
         // Conectar-se a um peer
         Peer peer = new Peer(new Socket(address.getAddress(), address.getPort()), info.hash()); // Exemplo fictício para estabelecer conexão

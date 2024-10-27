@@ -30,31 +30,27 @@ public class Peer {
     }
 
     public byte[] performHandshake() throws IOException {
-        try (var in = socket.getInputStream();
-             var out = socket.getOutputStream();
+        var in = socket.getInputStream();
+        var out = socket.getOutputStream();
+        final int handshakeMessageSize = 1 + PROTOCOL_BYTES.length + PADDING_8.length + 20 + 20;
+        final ByteBuffer payloadBuffer =
+                ByteBuffer.allocate(handshakeMessageSize);
+        payloadBuffer.put((byte) 19)
+                .put(PROTOCOL_BYTES)
+                .put(PADDING_8)
+                .put(infoHash)
+                .put("cbc12233445566778899".getBytes());
+        out.write(payloadBuffer.array());
+        final byte[] handshakeResponse = new byte[handshakeMessageSize];
+        in.read(handshakeResponse);
+        final byte[] peerIdResponse = new byte[20];
+        final ByteBuffer wrap = ByteBuffer.wrap(handshakeResponse);
+        wrap.position(48);
+        wrap.get(peerIdResponse, 0, 20);
 
-        ) {
-
-            final int handshakeMessageSize = 1 + PROTOCOL_BYTES.length + PADDING_8.length + 20 + 20;
-            final ByteBuffer payloadBuffer =
-                    ByteBuffer.allocate(handshakeMessageSize);
-            payloadBuffer.put((byte) 19)
-                    .put(PROTOCOL_BYTES)
-                    .put(PADDING_8)
-                    .put(infoHash)
-                    .put("cbc12233445566778899".getBytes());
-            out.write(payloadBuffer.array());
-            final byte[] handshakeResponse = new byte[handshakeMessageSize];
-            in.read(handshakeResponse);
-            final byte[] peerIdResponse = new byte[20];
-            final ByteBuffer wrap = ByteBuffer.wrap(handshakeResponse);
-            wrap.position(48);
-            wrap.get(peerIdResponse, 0, 20);
-
-            // Envia a mensagem de handshake
-            this.peerId= peerIdResponse;
-            return peerIdResponse;
-        }
+        // Envia a mensagem de handshake
+        this.peerId= peerIdResponse;
+        return peerIdResponse;
     }
 
     public void sendInterested() throws IOException {
