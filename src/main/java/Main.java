@@ -75,6 +75,27 @@ public class Main {
               }
 
           }
+          case "download" ->{
+              final var torrent = load(args[3]);
+              AnnounceResponse returned= new HttpRequests().get(torrent);
+              String outputPath = args[2]; // Ex: /tmp/test-piece-0
+
+              try (
+                      final var peer = Peer.connect(returned.peers().getFirst(), torrent);
+                      final var fileOutputStream = new FileOutputStream(new File(outputPath));
+              ) {
+                  for (int i = 0; i < returned.peers().size(); i++) {
+                      final var data = peer.downloadPiece(torrent.info(), i);
+                      try {
+                          fileOutputStream.write(data);
+                      } catch (IOException e) {
+                          throw new RuntimeException(e);
+                      }
+                  }
+
+              }
+
+          }
           case null, default -> System.out.println("Unknown command: " + command);
       }
 
