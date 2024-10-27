@@ -15,7 +15,7 @@ public class SocketClient {
 
         ) {
 
-            final int handshakeMessageSize = 1 + 19 + 8 + 20 + 20;
+            final int handshakeMessageSize = 1 + PROTOCOL_BYTES.length + PADDING_8.length + 20 + 20;
             final ByteBuffer payloadBuffer =
                     ByteBuffer.allocate(handshakeMessageSize);
             payloadBuffer.put((byte) 19)
