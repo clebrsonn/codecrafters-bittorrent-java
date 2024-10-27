@@ -96,7 +96,7 @@ public class Main {
               var magnetLink= args[1];
               var magnet= Magnet.of(magnetLink);
               System.out.printf("Tracker URL: %s%n", (magnet.getTrackerURL()));
-              System.out.printf("Peer ID: %s%n", new String(magnet.getInfoHash()));
+              System.out.printf("Peer ID: %s%n", DigestUtil.bytesToHex(magnet.getInfoHash()));
 
           }
           case null, default -> System.out.println("Unknown command: " + command);
