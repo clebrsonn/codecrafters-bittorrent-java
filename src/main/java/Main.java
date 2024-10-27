@@ -5,9 +5,7 @@ import tracker.AnnounceResponse;
 import tracker.HttpRequests;
 import utils.DigestUtil;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -57,23 +55,25 @@ public class Main {
           case "handshake" -> {
               final var torrent = load(bencodedValue);
               final var address= args[2].split(":");
-              System.out.println("Peer ID: " + DigestUtil.bytesToHex(new Peer(new Socket(address[0], Integer.parseInt(address[1])), torrent.getInfoHash()).performHandshake()));
+              try (final var peer = Peer.connect(new Socket(address[0], Integer.parseInt(address[1])), torrent)) {
+                  System.out.printf("Peer ID: %s%n", DigestUtil.bytesToHex(peer.getId()));
+              }
+
           }
           case "download_piece"->{
               final var torrent = load(args[3]);
               AnnounceResponse returned= new HttpRequests().get(torrent);
+              String outputPath = args[2]; // Ex: /tmp/test-piece-0
+              int pieceIndex = Integer.parseInt(args[4]);
 
-              returned.peers().forEach(p -> {
-                  try {
-                      //new Peer(new Socket(p.getAddress(), p.getPort()), torrent.getInfoHash()).performHandshake();
-                      int pieceIndex = Integer.parseInt(args[4]);
-                      String outputPath = args[2]; // Ex: /tmp/test-piece-0
-                      BittorrentDownloader.downloadPiece(p, pieceIndex, outputPath, torrent.info());
+              try (
+                      final var peer = Peer.connect(returned.peers().getFirst(), torrent);
+                      final var fileOutputStream = new FileOutputStream(new File(outputPath));
+              ) {
+                  final var data = peer.downloadPiece(torrent.info(), pieceIndex);
+                  fileOutputStream.write(data);
+              }
 
-                  } catch (Exception e) {
-                      throw new RuntimeException(e);
-                  }
-              });
           }
           case null, default -> System.out.println("Unknown command: " + command);
       }
