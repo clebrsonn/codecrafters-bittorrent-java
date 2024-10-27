@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 
@@ -8,58 +9,31 @@ public class SocketClient {
     private static final byte[] PADDING_8= new byte[8];
 
 
-    public byte[] connect(Socket socket, Torrent torrent){
+    public byte[] connect(Socket socket, Torrent torrent) throws IOException {
         try (var in = socket.getInputStream();
              var out = socket.getOutputStream();
 
-        ){
-            byte[] peerId = new byte[20];
-            new SecureRandom().nextBytes(peerId);
+        ) {
 
-            // Open input and output streams
-            final var infoHash = torrent.info().hash();
-            // Exchange data
-
-            byte[] handshakeMessage = buildHandshakeMessage(infoHash, peerId);
+            final int handshakeMessageSize = 1 + 19 + 8 + 20 + 20;
+            final ByteBuffer payloadBuffer =
+                    ByteBuffer.allocate(handshakeMessageSize);
+            payloadBuffer.put((byte) 19)
+                    .put(PROTOCOL_BYTES)
+                    .put(PADDING_8)
+                    .put(torrent.info().hash())
+                    .put("00112233445566778899".getBytes());
+            out.write(payloadBuffer.array());
+            final byte[] handshakeResponse = new byte[handshakeMessageSize];
+            in.read(handshakeResponse);
+            final byte[] peerIdResponse = new byte[20];
+            final ByteBuffer wrap = ByteBuffer.wrap(handshakeResponse);
+            wrap.position(48);
+            wrap.get(peerIdResponse, 0, 20);
 
             // Envia a mensagem de handshake
-            out.write(handshakeMessage);
-            out.flush();
 
-            // Recebe a resposta do handshake
-            byte[] response = new byte[68];  // O tamanho esperado da resposta é 68 bytes
-            int bytesRead = in.read(response);
-
-            if (bytesRead == 68) {
-                // Extrai o peer_id recebido (últimos 20 bytes da resposta)
-                byte[] receivedPeerId = new byte[20];
-                System.arraycopy(response, 48, receivedPeerId, 0, 20);
-
-                return receivedPeerId;
-            } else {
-                System.out.println("Resposta inesperada. Tamanho lido: " + bytesRead);
-                return null;
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            return peerIdResponse;
         }
     }
-
-    private static byte[] buildHandshakeMessage(byte[] infoHash, byte[] peerId) {
-
-        final var reserved = PADDING_8;
-
-        byte[] protocolBytes = PROTOCOL_BYTES;
-        byte pstrlen = (byte) protocolBytes.length;
-
-        byte[] handshake = new byte[49 + protocolBytes.length];
-        handshake[0] = pstrlen;
-        System.arraycopy(protocolBytes, 0, handshake, 1, protocolBytes.length);
-        System.arraycopy(reserved, 0, handshake, 1 + protocolBytes.length, reserved.length);
-        System.arraycopy(infoHash, 0, handshake, 1 + protocolBytes.length + reserved.length, infoHash.length);
-        System.arraycopy(peerId, 0, handshake, 1 + protocolBytes.length + reserved.length + infoHash.length, peerId.length);
-
-        return handshake;
-    }
-
 }
