@@ -84,15 +84,11 @@ public class Main {
                       final var peer = Peer.connect(returned.peers().getFirst(), torrent);
                       final var fileOutputStream = new FileOutputStream(new File(outputPath));
               ) {
-                  for (int i = 0; i < returned.peers().size(); i++) {
-                      final var data = peer.downloadPiece(torrent.info(), i);
-                      try {
-                          fileOutputStream.write(data);
-                      } catch (IOException e) {
-                          throw new RuntimeException(e);
-                      }
+                  final var pieceCount = torrent.info().pieces().size();
+                  for (var index = 0; index < pieceCount; ++index) {
+                      final var data = peer.downloadPiece(torrent.info(), index);
+                      fileOutputStream.write(data);
                   }
-
               }
 
           }
