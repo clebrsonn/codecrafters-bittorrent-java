@@ -6,6 +6,7 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -50,6 +51,11 @@ public class Main {
 
               System.out.println(returned.peers());
 
+          }
+          case "handshake" -> {
+              final var torrent = load(bencodedValue);
+              final var address= args[2].split(":");
+              new SocketClient().connect(new Socket(address[0], Integer.parseInt(address[1])), torrent);
           }
           case null, default -> System.out.println("Unknown command: " + command);
       }
