@@ -105,7 +105,7 @@ public class Main {
               try (final var peer = Peer.connect(returned.peers().getFirst(), magnet)) {
                   System.out.printf("Peer ID: %s%n", DigestUtil.bytesToHex(peer.getId()));
                   peer.awaitBitfield();
-                  System.out.printf("Peer Metadata Extension ID: 123: %s%n", peer.getMetadataExtensionId());
+                  System.out.printf("Peer Metadata Extension ID: %s%n", peer.getMetadataExtensionId());
               }
           }
           case null, default -> System.out.println("Unknown command: " + command);
