@@ -108,6 +108,23 @@ public class Main {
                   System.out.printf("Peer Metadata Extension ID: %s%n", peer.getMetadataExtensionId());
               }
           }
+          case "magnet_info" ->{
+              var magnetLink= args[1];
+              var magnet= Magnet.of(magnetLink);
+              AnnounceResponse returned= new HttpRequests().get(magnet);
+              try (final var peer = Peer.connect(returned.peers().getFirst(), magnet)) {
+                  var torrent= peer.queryTorrentInfoViaMetadataExtension();
+                  System.out.println("Tracker URL: " + magnet.getTrackerURL());
+                  System.out.println("Length: " + torrent.length());
+
+                  System.out.println("Info Hash: " + DigestUtil.bytesToHex(torrent.hash()));
+                  System.out.println("Piece Length: " + torrent.pieceLength());
+
+                  System.out.println("Piece Hashes:");
+
+                  torrent.pieces().forEach(piece -> System.out.println(DigestUtil.bytesToHex(piece)));
+              }
+          }
           case null, default -> System.out.println("Unknown command: " + command);
       }
 
