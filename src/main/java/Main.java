@@ -125,6 +125,23 @@ public class Main {
                   torrent.pieces().forEach(piece -> System.out.println(DigestUtil.bytesToHex(piece)));
               }
           }
+          case "magnet_download_piece" ->{
+              String outputPath = args[2]; // Ex: /tmp/test-piece-0
+              int pieceIndex = Integer.parseInt(args[4]);
+              var magnetLink= args[3];
+              var magnet= Magnet.of(magnetLink);
+              AnnounceResponse returned= new HttpRequests().get(magnet);
+
+              try (
+                      final var peer = Peer.connect(returned.peers().getFirst(), magnet);
+                      final var fileOutputStream = new FileOutputStream(new File(outputPath));
+              ) {
+                  var torrentInfo= peer.queryTorrentInfoViaMetadataExtension();
+                  final var data = peer.downloadPiece(torrentInfo, pieceIndex);
+                  fileOutputStream.write(data);
+              }
+
+          }
           case null, default -> System.out.println("Unknown command: " + command);
       }
 
