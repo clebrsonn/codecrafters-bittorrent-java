@@ -142,6 +142,25 @@ public class Main {
               }
 
           }
+          case "magnet_download" ->{
+              String outputPath = args[2]; // Ex: /tmp/test-piece-0
+
+              var magnetLink= args[3];
+              var magnet= Magnet.of(magnetLink);
+              AnnounceResponse returned= new HttpRequests().get(magnet);
+
+              try (
+                      final var peer = Peer.connect(returned.peers().getFirst(), magnet);
+                      final var fileOutputStream = new FileOutputStream(new File(outputPath));
+              ) {
+                  final var pieceCount = peer.queryTorrentInfoViaMetadataExtension().pieces().size();
+                  for (var index = 0; index < pieceCount; ++index) {
+                      final var data = peer.downloadPiece(peer.queryTorrentInfoViaMetadataExtension(), index);
+                      fileOutputStream.write(data);
+                  }
+              }
+
+          }
           case null, default -> System.out.println("Unknown command: " + command);
       }
 
